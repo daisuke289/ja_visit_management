@@ -13,7 +13,10 @@
       "Bash(bin/rails:*)",
       "Bash(cat:*)",
       "Bash(PATH=~/.rbenv/versions/3.2.0/bin:$PATH bundle exec rspec:*)",
-      "Bash(PATH=~/.rbenv/versions/3.2.0/bin:$PATH bundle install:*)"
+      "Bash(PATH=~/.rbenv/versions/3.2.0/bin:$PATH bundle install:*)",
+      "Bash(PATH=~/.rbenv/versions/3.2.0/bin:$PATH bin/rubocop:*)",
+      "Bash(PATH=~/.rbenv/versions/3.2.0/bin:$PATH bin/brakeman:*)",
+      "Bash(PATH=~/.rbenv/versions/3.2.0/bin:$PATH bin/rails generate:*)"
     ],
     "deny": [
       "Bash(sudo:)",
