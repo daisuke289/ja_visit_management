@@ -1,0 +1,25 @@
+<header class="bg-green-700 text-white shadow-lg">
+  <div class="flex items-center justify-between px-6 py-3">
+    <div class="flex items-center space-x-4">
+      <h1 class="text-xl font-bold">
+        <%= link_to 'JA訪問管理', root_path, class: 'hover:text-green-200' %>
+      </h1>
+      <% if current_user.branch.present? %>
+        <span class="text-green-200 text-sm">
+          <%= current_user.branch.name %>
+        </span>
+      <% end %>
+    </div>
+
+    <div class="flex items-center space-x-4">
+      <span class="text-sm">
+        <%= current_user.name %>
+        <span class="text-green-200">
+          (<%= I18n.t("activerecord.enums.user.role.#{current_user.role}") %>)
+        </span>
+      </span>
+      <%= button_to 'ログアウト', destroy_user_session_path, method: :delete,
+          class: 'bg-green-600 hover:bg-green-500 px-3 py-1 rounded text-sm' %>
+    </div>
+  </div>
+</header>

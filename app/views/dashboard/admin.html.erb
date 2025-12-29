@@ -1,0 +1,111 @@
+<% content_for(:title) { "本店ダッシュボード" } %>
+<% admin_dashboard_data %>
+
+<div class="space-y-6">
+  <h2 class="text-2xl font-bold text-gray-800">本店ダッシュボード</h2>
+
+  <!-- 全体統計 -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="text-sm text-gray-500">重要取引先（全支店）</div>
+      <div class="text-3xl font-bold text-gray-800"><%= @total_customers %></div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="text-sm text-gray-500">30日以内訪問済</div>
+      <div class="text-3xl font-bold text-green-600"><%= @total_visited_30days %></div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="text-sm text-gray-500">訪問率</div>
+      <div class="text-3xl font-bold text-blue-600">
+        <% rate = @total_customers > 0 ? (@total_visited_30days.to_f / @total_customers * 100).round(1) : 0 %>
+        <%= rate %>%
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="text-sm text-gray-500">期限切れアクション</div>
+      <div class="text-3xl font-bold text-red-600"><%= @total_overdue_actions %></div>
+    </div>
+  </div>
+
+  <!-- 支店別状況 -->
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-800">支店別状況</h3>
+    </div>
+    <div class="p-6">
+      <table class="w-full">
+        <thead>
+          <tr class="text-left text-sm text-gray-500 border-b">
+            <th class="pb-2">支店</th>
+            <th class="pb-2 text-right">重要取引先数</th>
+            <th class="pb-2 text-right">訪問率</th>
+            <th class="pb-2 text-right">期限切れ</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <% @branch_stats.each do |stat| %>
+            <tr class="hover:bg-gray-50">
+              <td class="py-3 font-medium"><%= stat[:branch].name %></td>
+              <td class="py-3 text-right"><%= stat[:customer_count] %></td>
+              <td class="py-3 text-right">
+                <span class="<%= stat[:visit_rate] < 50 ? 'text-red-600' : 'text-green-600' %>">
+                  <%= stat[:visit_rate] %>%
+                </span>
+              </td>
+              <td class="py-3 text-right">
+                <% if stat[:overdue_actions] > 0 %>
+                  <span class="text-red-600 font-bold"><%= stat[:overdue_actions] %></span>
+                <% else %>
+                  <span class="text-gray-400">0</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 未訪問30日超（全支店） -->
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+      <h3 class="text-lg font-semibold text-red-600">未訪問30日超（全支店）</h3>
+      <%= link_to '全て表示', customers_path(visit_status: 'overdue'), class: 'text-sm text-blue-600 hover:underline' %>
+    </div>
+    <div class="p-6">
+      <% if @unvisited_30days.present? %>
+        <table class="w-full">
+          <thead>
+            <tr class="text-left text-sm text-gray-500 border-b">
+              <th class="pb-2">支店</th>
+              <th class="pb-2">取引先</th>
+              <th class="pb-2 text-right">最終訪問</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <% @unvisited_30days.each do |customer| %>
+              <tr class="hover:bg-gray-50">
+                <td class="py-3 text-sm text-gray-500"><%= customer.branch&.name %></td>
+                <td class="py-3">
+                  <%= link_to customer.name, customer, class: 'text-blue-600 hover:underline' %>
+                </td>
+                <td class="py-3 text-right text-sm">
+                  <% if customer.last_visit_date %>
+                    <span class="text-red-500"><%= customer.days_since_last_visit %>日前</span>
+                  <% else %>
+                    <span class="text-red-500">未訪問</span>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <p class="text-gray-500 text-center py-4">該当なし</p>
+      <% end %>
+    </div>
+  </div>
+</div>

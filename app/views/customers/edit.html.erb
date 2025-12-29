@@ -1,0 +1,7 @@
+<% content_for(:title) { "#{@customer.name} - 編集" } %>
+
+<div class="max-w-2xl mx-auto">
+  <h2 class="text-2xl font-bold text-gray-800 mb-6">重要取引先 編集</h2>
+
+  <%= render 'form', customer: @customer %>
+</div>

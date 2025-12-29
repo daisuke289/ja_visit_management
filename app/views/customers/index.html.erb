@@ -1,0 +1,110 @@
+<% content_for(:title) { "重要取引先一覧" } %>
+
+<div class="space-y-6">
+  <div class="flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-gray-800">重要取引先一覧</h2>
+    <% if policy(Customer).create? %>
+      <%= link_to '新規登録', new_customer_path, class: 'bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg' %>
+    <% end %>
+  </div>
+
+  <!-- 検索・フィルタ -->
+  <div class="bg-white rounded-lg shadow p-6">
+    <%= form_with url: customers_path, method: :get, local: true, class: 'space-y-4' do %>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <%= text_field_tag :q, params[:q],
+              placeholder: '氏名・カナ・顧客番号で検索',
+              class: 'w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500' %>
+        </div>
+
+        <% if current_user.can_access_all_branches? && @branches.present? %>
+          <div>
+            <%= select_tag :branch_id,
+                options_from_collection_for_select(@branches, :id, :name, params[:branch_id]),
+                include_blank: '全支店',
+                class: 'w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500' %>
+          </div>
+        <% end %>
+
+        <div>
+          <%= select_tag :visit_status,
+              options_for_select([
+                ['全て', ''],
+                ['未訪問', 'never'],
+                ['30日超', 'overdue'],
+                ['14-30日', 'warning']
+              ], params[:visit_status]),
+              class: 'w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500' %>
+        </div>
+
+        <div>
+          <%= submit_tag '検索', class: 'bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg cursor-pointer' %>
+          <%= link_to 'クリア', customers_path, class: 'ml-2 text-gray-500 hover:text-gray-700' %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- 一覧テーブル -->
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <table class="w-full">
+      <thead class="bg-gray-50">
+        <tr class="text-left text-sm text-gray-500">
+          <th class="px-6 py-3">顧客番号</th>
+          <th class="px-6 py-3">氏名</th>
+          <% if current_user.can_access_all_branches? %>
+            <th class="px-6 py-3">支店</th>
+          <% end %>
+          <th class="px-6 py-3">住所</th>
+          <th class="px-6 py-3 text-center">最終訪問</th>
+          <th class="px-6 py-3 text-center">状態</th>
+          <th class="px-6 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <% @customers.each do |customer| %>
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 text-sm text-gray-500"><%= customer.customer_number %></td>
+            <td class="px-6 py-4">
+              <%= link_to customer, class: 'text-blue-600 hover:underline font-medium' do %>
+                <%= customer.name %>
+                <% if customer.name_kana.present? %>
+                  <span class="text-gray-400 text-sm ml-1">(<%= customer.name_kana %>)</span>
+                <% end %>
+              <% end %>
+            </td>
+            <% if current_user.can_access_all_branches? %>
+              <td class="px-6 py-4 text-sm text-gray-500"><%= customer.branch&.name %></td>
+            <% end %>
+            <td class="px-6 py-4 text-sm text-gray-500"><%= truncate(customer.address, length: 20) %></td>
+            <td class="px-6 py-4 text-center text-sm">
+              <% if customer.last_visit_date %>
+                <%= customer.last_visit_date.strftime('%Y/%m/%d') %>
+              <% else %>
+                <span class="text-gray-400">-</span>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 text-center">
+              <%= render 'shared/visit_status_badge', status: customer.visit_status %>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <%= link_to '詳細', customer, class: 'text-blue-600 hover:underline text-sm' %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <% if @customers.empty? %>
+      <div class="p-8 text-center text-gray-500">
+        該当する取引先がありません
+      </div>
+    <% end %>
+  </div>
+
+  <!-- ページネーション -->
+  <div class="flex justify-center">
+    <%= paginate @customers %>
+  </div>
+</div>

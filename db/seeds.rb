@@ -63,4 +63,54 @@ if Rails.env.development?
   puts "  - admin@example.com / password123 (システム管理者)"
   puts "  - honten@example.com / password123 (本店管理者)"
   puts "  - branch@example.com / password123 (支店長)"
+
+  # サンプルJA全顧客
+  [
+    { customer_number: 'JA001', name: '山田 太郎', name_kana: 'ヤマダ タロウ', branch: branch2,
+      has_banking: true, has_mutual_aid: true, has_agriculture: false },
+    { customer_number: 'JA002', name: '佐藤 花子', name_kana: 'サトウ ハナコ', branch: branch2,
+      has_banking: true, has_mutual_aid: false, has_agriculture: true },
+    { customer_number: 'JA003', name: '鈴木 一郎', name_kana: 'スズキ イチロウ', branch: branch3,
+      has_banking: true, has_mutual_aid: true, has_agriculture: true },
+    { customer_number: 'JA004', name: '田中 次郎', name_kana: 'タナカ ジロウ', branch: branch2,
+      has_banking: true, has_mutual_aid: true, has_funeral: true },
+    { customer_number: 'JA005', name: '高橋 三郎', name_kana: 'タカハシ サブロウ', branch: branch3,
+      has_banking: true, has_gas: true, has_real_estate: true },
+  ].each do |attrs|
+    JaCustomer.find_or_create_by!(customer_number: attrs[:customer_number]) do |c|
+      c.name = attrs[:name]
+      c.name_kana = attrs[:name_kana]
+      c.branch = attrs[:branch]
+      c.address = '東京都渋谷区1-2-3'
+      c.phone = '03-1234-5678'
+      c.has_banking = attrs[:has_banking] || false
+      c.has_mutual_aid = attrs[:has_mutual_aid] || false
+      c.has_agriculture = attrs[:has_agriculture] || false
+      c.has_funeral = attrs[:has_funeral] || false
+      c.has_gas = attrs[:has_gas] || false
+      c.has_real_estate = attrs[:has_real_estate] || false
+      c.deposit_balance = rand(100000..10000000)
+      c.last_synced_at = Time.current
+    end
+  end
+
+  puts "JA全顧客サンプルを作成しました（#{JaCustomer.count}件）"
+
+  # サンプル重要取引先
+  [
+    { customer_number: 'JA001', name: '山田 太郎', branch: branch2, last_visit_date: 10.days.ago },
+    { customer_number: 'JA002', name: '佐藤 花子', branch: branch2, last_visit_date: 45.days.ago },
+    { customer_number: 'JA003', name: '鈴木 一郎', branch: branch3, last_visit_date: nil },
+  ].each do |attrs|
+    Customer.find_or_create_by!(customer_number: attrs[:customer_number]) do |c|
+      c.name = attrs[:name]
+      c.name_kana = JaCustomer.find_by(customer_number: attrs[:customer_number])&.name_kana
+      c.branch = attrs[:branch]
+      c.address = '東京都渋谷区1-2-3'
+      c.phone = '03-1234-5678'
+      c.last_visit_date = attrs[:last_visit_date]
+    end
+  end
+
+  puts "重要取引先サンプルを作成しました（#{Customer.count}件）"
 end

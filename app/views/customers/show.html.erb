@@ -1,0 +1,216 @@
+<% content_for(:title) { @customer.name } %>
+
+<div class="space-y-6">
+  <!-- ヘッダー -->
+  <div class="flex justify-between items-start">
+    <div>
+      <div class="flex items-center space-x-4">
+        <h2 class="text-2xl font-bold text-gray-800"><%= @customer.name %></h2>
+        <%= render 'shared/visit_status_badge', status: @customer.visit_status %>
+      </div>
+      <p class="text-gray-500 mt-1">
+        顧客番号: <%= @customer.customer_number %>
+        <% if @customer.household_number.present? %>
+          | 世帯番号: <%= @customer.household_number %>
+        <% end %>
+      </p>
+    </div>
+
+    <div class="flex space-x-2">
+      <% if policy(@customer).update? %>
+        <%= link_to '編集', edit_customer_path(@customer), class: 'bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg' %>
+      <% end %>
+      <% if @customer.ja_customer.present? %>
+        <%= button_to 'JA情報を同期', sync_from_ja_customer_path(@customer),
+            method: :post,
+            class: 'bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg',
+            data: { confirm: 'JA全顧客マスタから最新情報を取得しますか？' } %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- 基本情報 -->
+    <div class="lg:col-span-2 space-y-6">
+      <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-800">基本情報</h3>
+        </div>
+        <div class="p-6">
+          <dl class="grid grid-cols-2 gap-4">
+            <div>
+              <dt class="text-sm text-gray-500">氏名カナ</dt>
+              <dd class="font-medium"><%= @customer.name_kana || '-' %></dd>
+            </div>
+            <div>
+              <dt class="text-sm text-gray-500">担当支店</dt>
+              <dd class="font-medium"><%= @customer.branch&.name %></dd>
+            </div>
+            <div>
+              <dt class="text-sm text-gray-500">電話番号</dt>
+              <dd class="font-medium"><%= @customer.phone || '-' %></dd>
+            </div>
+            <div>
+              <dt class="text-sm text-gray-500">郵便番号</dt>
+              <dd class="font-medium"><%= @customer.postal_code || '-' %></dd>
+            </div>
+            <div class="col-span-2">
+              <dt class="text-sm text-gray-500">住所</dt>
+              <dd class="font-medium"><%= @customer.address || '-' %></dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <!-- JA事業取引状況 -->
+      <% if (ja = @customer.ja_customer).present? %>
+        <div class="bg-white rounded-lg shadow">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-800">JA事業取引状況</h3>
+          </div>
+          <div class="p-6">
+            <div class="flex flex-wrap gap-2">
+              <% if ja.has_banking? %>
+                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">金融</span>
+              <% end %>
+              <% if ja.has_mutual_aid? %>
+                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">共済</span>
+              <% end %>
+              <% if ja.has_agriculture? %>
+                <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">営農</span>
+              <% end %>
+              <% if ja.has_funeral? %>
+                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">葬祭</span>
+              <% end %>
+              <% if ja.has_gas? %>
+                <span class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm">ガス</span>
+              <% end %>
+              <% if ja.has_real_estate? %>
+                <span class="bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm">不動産</span>
+              <% end %>
+            </div>
+            <% if ja.business_summary.blank? %>
+              <p class="text-gray-400">取引情報なし</p>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- 訪問履歴 -->
+      <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+          <h3 class="text-lg font-semibold text-gray-800">訪問履歴</h3>
+          <%# link_to '訪問記録を追加', new_customer_visit_record_path(@customer), class: 'text-sm text-blue-600 hover:underline' %>
+        </div>
+        <div class="p-6">
+          <% if @customer.visit_records.any? %>
+            <div class="space-y-4">
+              <% @customer.visit_records.order(visited_at: :desc).limit(5).each do |record| %>
+                <div class="border-l-4 border-green-500 pl-4">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <span class="font-medium"><%= record.visit_type&.name %></span>
+                      <span class="text-gray-500 text-sm ml-2">(<%= record.interviewee %>)</span>
+                    </div>
+                    <span class="text-sm text-gray-500"><%= record.visited_at&.strftime('%Y/%m/%d') %></span>
+                  </div>
+                  <p class="text-sm text-gray-600 mt-1"><%= truncate(record.content, length: 100) %></p>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <p class="text-gray-400 text-center py-4">訪問履歴はありません</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- サイドバー -->
+    <div class="space-y-6">
+      <!-- 次アクション -->
+      <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-800">次アクション</h3>
+        </div>
+        <div class="p-6">
+          <% pending = @customer.pending_actions %>
+          <% if pending.any? %>
+            <ul class="space-y-3">
+              <% pending.limit(5).each do |action| %>
+                <li class="flex items-start">
+                  <% if action.due_date && action.due_date < Date.current %>
+                    <span class="w-2 h-2 bg-red-500 rounded-full mt-2 mr-2"></span>
+                  <% else %>
+                    <span class="w-2 h-2 bg-yellow-500 rounded-full mt-2 mr-2"></span>
+                  <% end %>
+                  <div>
+                    <p class="font-medium text-sm"><%= action.title %></p>
+                    <p class="text-xs text-gray-500">
+                      期限: <%= action.due_date&.strftime('%Y/%m/%d') || '未設定' %>
+                    </p>
+                  </div>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="text-gray-400 text-center">未完了のアクションはありません</p>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- 家族構成 -->
+      <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+          <h3 class="text-lg font-semibold text-gray-800">家族構成</h3>
+          <%# link_to '編集', customer_family_members_path(@customer), class: 'text-sm text-blue-600 hover:underline' %>
+        </div>
+        <div class="p-6">
+          <% if @customer.family_members.any? %>
+            <ul class="space-y-2">
+              <% @customer.family_members.order(:generation, :birth_date).each do |member| %>
+                <li class="flex justify-between items-center text-sm">
+                  <span>
+                    <%= member.name %>
+                    <span class="text-gray-400">(<%= member.relationship %>)</span>
+                  </span>
+                  <% if member.is_cohabitant? %>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">同居</span>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="text-gray-400 text-center">家族情報は登録されていません</p>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- 財産診断 -->
+      <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+          <h3 class="text-lg font-semibold text-gray-800">財産診断</h3>
+          <%# link_to 'アップロード', new_customer_diagnosis_path(@customer), class: 'text-sm text-blue-600 hover:underline' %>
+        </div>
+        <div class="p-6">
+          <% if @customer.diagnoses.any? %>
+            <ul class="space-y-2">
+              <% @customer.diagnoses.order(diagnosed_on: :desc).limit(3).each do |diagnosis| %>
+                <li class="text-sm">
+                  <span class="font-medium"><%= diagnosis.title %></span>
+                  <span class="text-gray-400">(<%= diagnosis.diagnosed_on&.strftime('%Y/%m') %>)</span>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="text-gray-400 text-center">財産診断はありません</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 戻るリンク -->
+  <div class="pt-4">
+    <%= link_to '← 一覧に戻る', customers_path, class: 'text-gray-500 hover:text-gray-700' %>
+  </div>
+</div>

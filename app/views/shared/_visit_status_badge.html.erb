@@ -1,0 +1,30 @@
+<%
+  badge_class = case status
+  when :ok
+    'bg-green-100 text-green-800'
+  when :warning
+    'bg-yellow-100 text-yellow-800'
+  when :overdue
+    'bg-red-100 text-red-800'
+  when :never
+    'bg-gray-100 text-gray-800'
+  else
+    'bg-gray-100 text-gray-800'
+  end
+
+  badge_text = case status
+  when :ok
+    '良好'
+  when :warning
+    '要注意'
+  when :overdue
+    '要訪問'
+  when :never
+    '未訪問'
+  else
+    '-'
+  end
+%>
+<span class="px-2 py-1 text-xs font-medium rounded-full <%= badge_class %>">
+  <%= badge_text %>
+</span>

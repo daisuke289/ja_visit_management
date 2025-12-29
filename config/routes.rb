@@ -1,15 +1,48 @@
 Rails.application.routes.draw do
   devise_for :users
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
+  # ダッシュボード（ルート）
+  root 'dashboard#show'
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+  # 重要取引先
+  resources :customers do
+    member do
+      post :sync_from_ja
+    end
+  end
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # JA全顧客検索API（Ajax用）
+  resources :ja_customers, only: [:index, :show] do
+    collection do
+      get :search
+    end
+  end
+
+  # 管理者機能
+  namespace :admin do
+    # ダッシュボード
+    get 'dashboard', to: 'dashboard#show'
+
+    # JA全顧客インポート
+    resources :ja_customer_imports, only: [:new, :create, :show]
+
+    # 重要取引先インポート
+    resources :customer_imports, only: [:new, :create, :show]
+
+    # 支店管理
+    resources :branches
+
+    # JA全顧客一覧
+    resources :ja_customers, only: [:index, :show]
+  end
+
+  # システム管理者機能
+  namespace :system do
+    resources :users
+    resources :branches
+    resources :visit_types
+  end
+
+  # ヘルスチェック
+  get 'up' => 'rails/health#show', as: :rails_health_check
 end
