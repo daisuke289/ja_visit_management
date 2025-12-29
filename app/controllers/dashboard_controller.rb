@@ -29,7 +29,18 @@ class DashboardController < ApplicationController
     @total_customers = Customer.count
     @total_visited_30days = Customer.where("last_visit_date >= ?", 30.days.ago).count
     @total_overdue_actions = Action.where(status: :pending).where("due_date < ?", Date.current).count
-    @unvisited_30days = Customer.unvisited_for(30).limit(10)
+    @unvisited_30days = Customer.unvisited_for(30).includes(:branch).limit(10)
+
+    # グラフ用データ：週間訪問件数推移（過去12週）
+    @weekly_visits = VisitRecord.where("visited_at >= ?", 12.weeks.ago)
+                                .group_by_week(:visited_at, format: "%m/%d")
+                                .count
+
+    # グラフ用データ：訪問種別別件数（過去30日）
+    @visits_by_type = VisitRecord.joins(:visit_type)
+                                 .where("visited_at >= ?", 30.days.ago)
+                                 .group("visit_types.name")
+                                 .count
   end
   helper_method :admin_dashboard_data
 
@@ -57,6 +68,20 @@ class DashboardController < ApplicationController
     @customer_count = branch.customers.count
     @visit_rate = branch.visit_rate
     @overdue_count = @overdue_actions.count
+
+    # グラフ用データ：週間訪問件数推移（過去12週、自支店のみ）
+    @weekly_visits = VisitRecord.joins(:customer)
+                                .where(customers: { branch_id: branch.id })
+                                .where("visited_at >= ?", 12.weeks.ago)
+                                .group_by_week(:visited_at, format: "%m/%d")
+                                .count
+
+    # グラフ用データ：訪問種別別件数（過去30日、自支店のみ）
+    @visits_by_type = VisitRecord.joins(:customer, :visit_type)
+                                 .where(customers: { branch_id: branch.id })
+                                 .where("visited_at >= ?", 30.days.ago)
+                                 .group("visit_types.name")
+                                 .count
   end
   helper_method :branch_dashboard_data
 end
