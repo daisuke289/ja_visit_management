@@ -30,6 +30,29 @@
     </div>
   </div>
 
+  <!-- グラフセクション -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- 週間訪問件数推移 -->
+    <div class="bg-white rounded-lg shadow">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-800">週間訪問件数推移（過去12週）</h3>
+      </div>
+      <div class="p-6">
+        <%= line_chart @weekly_visits, xtitle: "週", ytitle: "訪問件数", colors: ["#3B82F6"] %>
+      </div>
+    </div>
+
+    <!-- 訪問種別別件数 -->
+    <div class="bg-white rounded-lg shadow">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-800">訪問種別（過去30日）</h3>
+      </div>
+      <div class="p-6">
+        <%= pie_chart @visits_by_type, donut: true, legend: "bottom" %>
+      </div>
+    </div>
+  </div>
+
   <!-- 支店別状況 -->
   <div class="bg-white rounded-lg shadow">
     <div class="px-6 py-4 border-b border-gray-200">
