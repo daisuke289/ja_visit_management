@@ -2,7 +2,17 @@
   "permissions": {
     "allow": [
       "mcp__serena__get_symbols_overview",
-      "mcp__serena__list_dir"
+      "mcp__serena__list_dir",
+      "Bash(bundle exec rspec:*)",
+      "mcp__serena__read_memory",
+      "Bash(/opt/homebrew/opt/ruby/bin/bundle exec rspec:*)",
+      "Bash(ruby:*)",
+      "Bash(source ~/.zshrc)",
+      "Bash(~/.mise/shims/ruby --version)",
+      "Bash(~/.mise/shims/bundle exec rspec)",
+      "Bash(bin/rails:*)",
+      "Bash(cat:*)",
+      "Bash(PATH=~/.rbenv/versions/3.2.0/bin:$PATH bundle exec rspec:*)"
     ],
     "deny": [
       "Bash(sudo:)",

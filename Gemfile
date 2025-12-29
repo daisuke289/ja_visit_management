@@ -77,6 +77,9 @@ gem "devise-i18n"
 # iCal出力（訪問計画のカレンダー連携用）
 gem "icalendar"
 
+# カレンダー表示
+gem "simple_calendar"
+
 # グラフ表示
 gem "chartkick"
 gem "groupdate"
