@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(export PATH=\"$HOME/.rbenv/bin:$PATH\")",
+      "Bash(rails generate:*)"
+    ]
+  }
+}
