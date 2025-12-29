@@ -1,0 +1,127 @@
+<% content_for(:title) { "訪問カレンダー" } %>
+
+<div class="space-y-6">
+  <div class="flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-gray-800">訪問カレンダー</h2>
+    <div class="flex items-center space-x-4">
+      <%= link_to "iCal出力", calendar_ical_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" %>
+    </div>
+  </div>
+
+  <!-- 月ナビゲーション -->
+  <div class="bg-white rounded-lg shadow p-4">
+    <div class="flex justify-between items-center mb-4">
+      <%= link_to calendar_path(start_date: @start_date.prev_month), class: "p-2 hover:bg-gray-100 rounded" do %>
+        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      <% end %>
+      <h3 class="text-xl font-semibold text-gray-800">
+        <%= l(@start_date, format: "%Y年%-m月") %>
+      </h3>
+      <%= link_to calendar_path(start_date: @start_date.next_month), class: "p-2 hover:bg-gray-100 rounded" do %>
+        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      <% end %>
+    </div>
+
+    <!-- 今月へ戻るボタン -->
+    <% unless @start_date.beginning_of_month == Date.current.beginning_of_month %>
+      <div class="text-center mb-4">
+        <%= link_to "今月へ", calendar_path, class: "text-blue-600 hover:underline text-sm" %>
+      </div>
+    <% end %>
+
+    <!-- カレンダー本体 -->
+    <div class="simple-calendar">
+      <%= month_calendar(events: @visit_plans, attribute: :planned_date, start_date: @start_date) do |date, events| %>
+        <div class="min-h-24 p-1 border border-gray-200 <%= 'bg-blue-50' if date == Date.current %> <%= 'bg-gray-100' if date.month != @start_date.month %>">
+          <div class="text-right text-sm <%= date.sunday? ? 'text-red-500' : date.saturday? ? 'text-blue-500' : 'text-gray-700' %>">
+            <%= date.day %>
+          </div>
+
+          <% events.each do |plan| %>
+            <%= link_to customer_visit_plan_path(plan.customer, plan),
+                        class: "block mt-1 px-1 py-0.5 text-xs rounded truncate #{plan.completed? ? 'bg-green-100 text-green-800' : plan.overdue? ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}" do %>
+              <span class="font-medium"><%= plan.customer.name %></span>
+            <% end %>
+          <% end %>
+
+          <% # 訪問記録（計画なし） %>
+          <% @visit_records.select { |r| r.visited_at.to_date == date && r.visit_plan_id.nil? }.each do |record| %>
+            <%= link_to customer_visit_record_path(record.customer, record),
+                        class: "block mt-1 px-1 py-0.5 text-xs rounded truncate bg-purple-100 text-purple-800" do %>
+              <span class="font-medium"><%= record.customer.name %></span>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- 凡例 -->
+  <div class="bg-white rounded-lg shadow p-4">
+    <h4 class="text-sm font-medium text-gray-700 mb-2">凡例</h4>
+    <div class="flex flex-wrap gap-4 text-sm">
+      <div class="flex items-center">
+        <span class="w-4 h-4 bg-blue-100 rounded mr-2"></span>
+        <span class="text-gray-600">訪問予定</span>
+      </div>
+      <div class="flex items-center">
+        <span class="w-4 h-4 bg-green-100 rounded mr-2"></span>
+        <span class="text-gray-600">訪問完了</span>
+      </div>
+      <div class="flex items-center">
+        <span class="w-4 h-4 bg-red-100 rounded mr-2"></span>
+        <span class="text-gray-600">期限超過</span>
+      </div>
+      <div class="flex items-center">
+        <span class="w-4 h-4 bg-purple-100 rounded mr-2"></span>
+        <span class="text-gray-600">計画外訪問</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 今月の訪問リスト -->
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-800">今月の訪問予定</h3>
+    </div>
+    <div class="p-6">
+      <% if @visit_plans.scheduled.any? %>
+        <table class="w-full">
+          <thead>
+            <tr class="text-left text-sm text-gray-500 border-b">
+              <th class="pb-2">予定日</th>
+              <th class="pb-2">取引先</th>
+              <th class="pb-2">種別</th>
+              <th class="pb-2">目的</th>
+              <th class="pb-2">担当</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <% @visit_plans.scheduled.order(:planned_date).each do |plan| %>
+              <tr class="hover:bg-gray-50 <%= 'bg-red-50' if plan.overdue? %>">
+                <td class="py-3">
+                  <%= plan.planned_date.strftime('%m/%d (%a)') %>
+                  <% if plan.overdue? %>
+                    <span class="ml-1 text-xs text-red-600">期限超過</span>
+                  <% end %>
+                </td>
+                <td class="py-3">
+                  <%= link_to plan.customer.name, plan.customer, class: 'text-blue-600 hover:underline' %>
+                </td>
+                <td class="py-3"><%= plan.visit_type.name %></td>
+                <td class="py-3 text-sm text-gray-500"><%= truncate(plan.purpose, length: 30) %></td>
+                <td class="py-3 text-sm text-gray-500"><%= plan.user.name %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <p class="text-gray-500 text-center py-4">今月の訪問予定はありません</p>
+      <% end %>
+    </div>
+  </div>
+</div>

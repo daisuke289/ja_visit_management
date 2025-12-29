@@ -27,6 +27,10 @@ Rails.application.routes.draw do
   # 訪問記録一覧（全顧客横断）
   resources :visit_records, only: [ :index ]
 
+  # カレンダー
+  get "calendar", to: "calendar#show", as: :calendar
+  get "calendar/ical", to: "calendar#ical", as: :calendar_ical
+
   # JA全顧客検索API（Ajax用）
   resources :ja_customers, only: [ :index, :show ] do
     collection do
