@@ -1,1 +1,47 @@
 @import "tailwindcss";
+
+/* Simple Calendar styling */
+.simple-calendar {
+  @apply w-full;
+
+  .month-name {
+    @apply sr-only;
+  }
+
+  table {
+    @apply w-full border-collapse;
+  }
+
+  th {
+    @apply bg-gray-50 text-gray-600 text-sm font-medium py-2 text-center border border-gray-200;
+  }
+
+  td {
+    @apply align-top;
+  }
+
+  .day {
+    @apply border border-gray-200 bg-white min-h-24 transition-colors;
+
+    &:hover {
+      @apply bg-gray-50;
+    }
+  }
+
+  .wday-0 { /* 日曜日 */
+    @apply bg-red-50;
+  }
+
+  .wday-6 { /* 土曜日 */
+    @apply bg-blue-50;
+  }
+
+  .today {
+    @apply bg-yellow-50 ring-2 ring-yellow-400 ring-inset;
+  }
+
+  .prev-month,
+  .next-month {
+    @apply bg-gray-100 text-gray-400;
+  }
+}
