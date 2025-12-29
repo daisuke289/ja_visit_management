@@ -43,6 +43,36 @@
 
 ---
 
+## Claude Code 開発ルール
+
+### コード調査・分析は Serena MCP 必須
+
+Rubyコード（`.rb`ファイル）の調査・分析時は、**必ずSerena MCPツールを使用**すること。
+
+**禁止事項:**
+- `.rb`ファイル全文を`Read`ツールで読み込むこと
+- `cat`や`head`コマンドでRubyファイルを表示すること
+
+**必須ツール:**
+| 目的 | 使用ツール |
+|------|-----------|
+| ファイル内シンボル一覧取得 | `get_symbols_overview` |
+| シンボル検索（クラス/メソッド） | `find_symbol` |
+| 参照元の検索 | `find_referencing_symbols` |
+| パターン検索（コード内文字列） | `search_for_pattern` |
+
+**正しい調査フロー:**
+1. `get_symbols_overview` でファイルの構造を把握
+2. `find_symbol` で必要なメソッド/クラスを特定（`include_body: true`で本体取得）
+3. `find_referencing_symbols` で影響範囲を調査
+
+**例外（Read可）:**
+- 設定ファイル: `.yml`, `.json`, `Gemfile`, `Procfile`等
+- ビューテンプレート: `.erb`, `.html`
+- ドキュメント: `.md`
+
+---
+
 ## データモデル
 
 ### ER図（主要エンティティ）
