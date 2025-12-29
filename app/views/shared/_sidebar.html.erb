@@ -1,5 +1,7 @@
-<aside class="w-64 bg-white shadow-md min-h-screen">
-  <nav class="p-4">
+<aside id="sidebar"
+       class="fixed md:static inset-y-0 left-0 z-40 w-64 bg-white shadow-md min-h-screen transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out"
+       data-sidebar-target="menu">
+  <nav class="p-4 pt-16 md:pt-4">
     <ul class="space-y-2">
       <li>
         <%= link_to root_path, class: "flex items-center px-4 py-2 rounded hover:bg-gray-100 #{current_page?(root_path) ? 'bg-green-50 text-green-700' : 'text-gray-700'}" do %>
@@ -96,3 +98,10 @@
     </ul>
   </nav>
 </aside>
+
+<!-- モバイル用オーバーレイ -->
+<div id="sidebar-overlay"
+     class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden md:hidden"
+     data-sidebar-target="overlay"
+     data-action="click->sidebar#close">
+</div>
