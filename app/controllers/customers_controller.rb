@@ -94,7 +94,15 @@ class CustomersController < ApplicationController
   private
 
   def set_customer
-    @customer = Customer.find(params[:id])
+    @customer = Customer.includes(
+      :branch,
+      :ja_customer,
+      visit_plans: :visit_type,
+      visit_records: :visit_type,
+      actions: :user,
+      family_members: [],
+      diagnoses: []
+    ).find(params[:id])
   end
 
   def customer_params

@@ -16,7 +16,8 @@
       "Bash(PATH=~/.rbenv/versions/3.2.0/bin:$PATH bundle install:*)",
       "Bash(PATH=~/.rbenv/versions/3.2.0/bin:$PATH bin/rubocop:*)",
       "Bash(PATH=~/.rbenv/versions/3.2.0/bin:$PATH bin/brakeman:*)",
-      "Bash(PATH=~/.rbenv/versions/3.2.0/bin:$PATH bin/rails generate:*)"
+      "Bash(PATH=~/.rbenv/versions/3.2.0/bin:$PATH bin/rails generate:*)",
+      "Bash(PATH=~/.rbenv/versions/3.2.0/bin:$PATH bin/rails db:migrate:*)"
     ],
     "deny": [
       "Bash(sudo:)",

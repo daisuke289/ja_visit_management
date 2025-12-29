@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_29_114212) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_29_120207) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -28,6 +28,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_29_114212) do
     t.index ["customer_id"], name: "index_actions_on_customer_id"
     t.index ["due_date"], name: "index_actions_on_due_date"
     t.index ["next_visit_record_id"], name: "index_actions_on_next_visit_record_id"
+    t.index ["status", "due_date"], name: "index_actions_on_status_and_due_date"
     t.index ["status"], name: "index_actions_on_status"
     t.index ["user_id"], name: "index_actions_on_user_id"
     t.index ["visit_record_id"], name: "index_actions_on_visit_record_id"
@@ -84,6 +85,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_29_114212) do
     t.index ["branch_id"], name: "index_customers_on_branch_id"
     t.index ["customer_number"], name: "index_customers_on_customer_number", unique: true
     t.index ["household_number"], name: "index_customers_on_household_number"
+    t.index ["last_visit_date"], name: "index_customers_on_last_visit_date"
     t.index ["name_kana"], name: "index_customers_on_name_kana"
   end
 
@@ -181,6 +183,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_29_114212) do
     t.datetime "updated_at", null: false
     t.index ["customer_id"], name: "index_visit_plans_on_customer_id"
     t.index ["planned_date"], name: "index_visit_plans_on_planned_date"
+    t.index ["status", "planned_date"], name: "index_visit_plans_on_status_and_planned_date"
     t.index ["status"], name: "index_visit_plans_on_status"
     t.index ["user_id"], name: "index_visit_plans_on_user_id"
     t.index ["visit_type_id"], name: "index_visit_plans_on_visit_type_id"
@@ -197,6 +200,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_29_114212) do
     t.bigint "visit_plan_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["customer_id", "visited_at"], name: "index_visit_records_on_customer_and_visited_at"
     t.index ["customer_id"], name: "index_visit_records_on_customer_id"
     t.index ["user_id"], name: "index_visit_records_on_user_id"
     t.index ["visit_plan_id"], name: "index_visit_records_on_visit_plan_id"
