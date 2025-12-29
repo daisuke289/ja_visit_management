@@ -17,6 +17,8 @@ Rails.application.routes.draw do
         patch :cancel
       end
     end
+    resources :family_members, except: [ :show ]
+    resources :diagnoses
   end
 
   # 訪問計画一覧（全顧客横断）

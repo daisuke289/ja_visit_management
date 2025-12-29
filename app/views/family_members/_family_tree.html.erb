@@ -1,0 +1,55 @@
+<%# 家系図表示（リスト形式） %>
+<div class="space-y-4">
+  <%
+    # 世代ごとにグループ化
+    generations = family_members.group_by(&:generation).sort_by { |gen, _| gen || 0 }.reverse
+  %>
+
+  <% generations.each do |generation, members| %>
+    <div class="border-l-4 pl-4 <%= generation_border_class(generation) %>">
+      <div class="text-sm text-gray-500 font-medium mb-2">
+        <%= generation_label(generation) %>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <% members.sort_by { |m| m.birth_date || Date.new(9999) }.each do |member| %>
+          <div class="bg-gray-50 rounded-lg p-3 <%= member.is_living? ? '' : 'opacity-60' %>">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="font-medium <%= member.householder? ? 'text-blue-600' : 'text-gray-800' %>">
+                  <%= member.display_name %>
+                  <% if member.householder? %>
+                    <span class="text-xs bg-blue-100 text-blue-800 px-1 rounded">世帯主</span>
+                  <% end %>
+                </div>
+                <div class="text-sm text-gray-500">
+                  <%= member.relationship %>
+                  <% if member.age %>
+                    (<%= member.age %>歳)
+                  <% end %>
+                </div>
+              </div>
+              <div class="flex flex-col items-end gap-1">
+                <% if member.is_cohabitant? %>
+                  <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">同居</span>
+                <% end %>
+                <% if member.has_ja_transaction? %>
+                  <span class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">JA取引</span>
+                <% end %>
+              </div>
+            </div>
+            <% if member.spouse_member.present? %>
+              <div class="mt-2 text-xs text-gray-400">
+                配偶者: <%= member.spouse_member.name %>
+              </div>
+            <% end %>
+            <% if member.notes.present? %>
+              <div class="mt-2 text-xs text-gray-600 bg-yellow-50 px-2 py-1 rounded">
+                <%= member.notes %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,65 @@
+<% content_for(:title) { "#{@customer.name} - 財産診断" } %>
+
+<div class="space-y-6">
+  <!-- ヘッダー -->
+  <div class="flex justify-between items-start">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-800">財産診断履歴</h2>
+      <p class="text-gray-500 mt-1">
+        <%= link_to @customer.name, customer_path(@customer), class: 'text-blue-600 hover:underline' %> の財産診断
+      </p>
+    </div>
+    <div class="flex space-x-2">
+      <%= link_to 'アップロード', new_customer_diagnosis_path(@customer),
+          class: 'bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg' %>
+    </div>
+  </div>
+
+  <!-- 診断一覧 -->
+  <div class="bg-white rounded-lg shadow">
+    <% if @diagnoses.any? %>
+      <div class="divide-y divide-gray-200">
+        <% @diagnoses.each do |diagnosis| %>
+          <div class="p-6 hover:bg-gray-50">
+            <div class="flex justify-between items-start">
+              <div class="flex items-start space-x-4">
+                <div class="text-3xl">
+                  <%= diagnosis.document_icon %>
+                </div>
+                <div>
+                  <h4 class="font-medium text-gray-800">
+                    <%= link_to diagnosis.title, customer_diagnosis_path(@customer, diagnosis), class: 'hover:text-blue-600' %>
+                  </h4>
+                  <p class="text-sm text-gray-500 mt-1">
+                    実施日: <%= diagnosis.display_date %>
+                    | 登録者: <%= diagnosis.user&.name %>
+                  </p>
+                  <% if diagnosis.notes.present? %>
+                    <p class="text-sm text-gray-600 mt-2"><%= truncate(diagnosis.notes, length: 100) %></p>
+                  <% end %>
+                </div>
+              </div>
+              <div class="flex space-x-2">
+                <% if diagnosis.document.attached? %>
+                  <%= link_to 'ダウンロード',
+                      rails_blob_path(diagnosis.document, disposition: 'attachment'),
+                      class: 'text-sm text-blue-600 hover:underline' %>
+                <% end %>
+                <%= link_to '編集', edit_customer_diagnosis_path(@customer, diagnosis), class: 'text-sm text-gray-600 hover:underline' %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="p-6">
+        <p class="text-gray-400 text-center py-8">財産診断が登録されていません</p>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- 戻るリンク -->
+  <div class="pt-4">
+    <%= link_to '← 顧客詳細に戻る', customer_path(@customer), class: 'text-gray-500 hover:text-gray-700' %>
+  </div>
+</div>

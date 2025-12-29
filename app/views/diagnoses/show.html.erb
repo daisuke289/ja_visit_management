@@ -1,0 +1,85 @@
+<% content_for(:title) { "#{@diagnosis.title}" } %>
+
+<div class="space-y-6">
+  <!-- ヘッダー -->
+  <div class="flex justify-between items-start">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-800"><%= @diagnosis.title %></h2>
+      <p class="text-gray-500 mt-1">
+        <%= link_to @customer.name, customer_path(@customer), class: 'text-blue-600 hover:underline' %> の財産診断
+      </p>
+    </div>
+    <div class="flex space-x-2">
+      <%= link_to '編集', edit_customer_diagnosis_path(@customer, @diagnosis), class: 'bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg' %>
+      <%= button_to '削除', customer_diagnosis_path(@customer, @diagnosis),
+          method: :delete,
+          class: 'bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg',
+          data: { confirm: 'この財産診断を削除しますか？' } %>
+    </div>
+  </div>
+
+  <!-- 診断情報 -->
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-800">診断情報</h3>
+    </div>
+    <div class="p-6">
+      <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <dt class="text-sm text-gray-500">診断実施日</dt>
+          <dd class="font-medium"><%= @diagnosis.display_date %></dd>
+        </div>
+        <div>
+          <dt class="text-sm text-gray-500">登録者</dt>
+          <dd class="font-medium"><%= @diagnosis.user&.name %></dd>
+        </div>
+        <% if @diagnosis.notes.present? %>
+          <div class="md:col-span-2">
+            <dt class="text-sm text-gray-500">備考</dt>
+            <dd class="font-medium whitespace-pre-wrap"><%= @diagnosis.notes %></dd>
+          </div>
+        <% end %>
+      </dl>
+    </div>
+  </div>
+
+  <!-- 添付ファイル -->
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-800">添付ファイル</h3>
+    </div>
+    <div class="p-6">
+      <% if @diagnosis.document.attached? %>
+        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div class="flex items-center space-x-3">
+            <span class="text-3xl"><%= @diagnosis.document_icon %></span>
+            <div>
+              <p class="font-medium"><%= @diagnosis.document.filename %></p>
+              <p class="text-sm text-gray-500">
+                <%= number_to_human_size(@diagnosis.document.byte_size) %>
+              </p>
+            </div>
+          </div>
+          <div class="flex space-x-2">
+            <% if @diagnosis.document_type == :pdf %>
+              <%= link_to 'プレビュー',
+                  rails_blob_path(@diagnosis.document, disposition: 'inline'),
+                  target: '_blank',
+                  class: 'bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg' %>
+            <% end %>
+            <%= link_to 'ダウンロード',
+                rails_blob_path(@diagnosis.document, disposition: 'attachment'),
+                class: 'bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg' %>
+          </div>
+        </div>
+      <% else %>
+        <p class="text-gray-400 text-center py-4">ファイルが添付されていません</p>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- 戻るリンク -->
+  <div class="pt-4">
+    <%= link_to '← 一覧に戻る', customer_diagnoses_path(@customer), class: 'text-gray-500 hover:text-gray-700' %>
+  </div>
+</div>

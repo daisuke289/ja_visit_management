@@ -1,0 +1,112 @@
+<% content_for(:title) { "#{@customer.name} - 家族構成" } %>
+
+<div class="space-y-6">
+  <!-- ヘッダー -->
+  <div class="flex justify-between items-start">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-800">家族構成</h2>
+      <p class="text-gray-500 mt-1">
+        <%= link_to @customer.name, customer_path(@customer), class: 'text-blue-600 hover:underline' %> の家族情報
+      </p>
+    </div>
+    <div class="flex space-x-2">
+      <%= link_to '家族を追加', new_customer_family_member_path(@customer),
+          class: 'bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg' %>
+    </div>
+  </div>
+
+  <!-- 家系図表示 -->
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-800">家系図</h3>
+    </div>
+    <div class="p-6">
+      <% if @family_members.any? %>
+        <%= render partial: 'family_tree', locals: { customer: @customer, family_members: @family_members } %>
+      <% else %>
+        <p class="text-gray-400 text-center py-8">家族情報が登録されていません</p>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- 家族メンバー一覧 -->
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-800">家族メンバー一覧</h3>
+    </div>
+    <% if @family_members.any? %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">氏名</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">続柄</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">年齢</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">状態</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">JA取引</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @family_members.each do |member| %>
+              <tr class="<%= member.is_living? ? '' : 'bg-gray-50 text-gray-400' %>">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="font-medium"><%= member.display_name %></div>
+                  <% if member.name_kana.present? %>
+                    <div class="text-sm text-gray-400"><%= member.name_kana %></div>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap"><%= member.relationship %></td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <% if member.age %>
+                    <%= member.age %>歳
+                  <% else %>
+                    -
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex flex-wrap gap-1">
+                    <% if member.is_cohabitant? %>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded">同居</span>
+                    <% end %>
+                    <% unless member.is_living? %>
+                      <span class="bg-gray-200 text-gray-600 text-xs px-2 py-0.5 rounded">故人</span>
+                    <% end %>
+                    <% if member.potential_heir? %>
+                      <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded">推定相続人</span>
+                    <% end %>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <% if member.has_ja_transaction? %>
+                    <span class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded">取引あり</span>
+                  <% elsif member.ja_customer_number.present? %>
+                    <span class="text-xs text-gray-400"><%= member.ja_customer_number %></span>
+                  <% else %>
+                    <span class="text-gray-300">-</span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  <%= link_to '編集', edit_customer_family_member_path(@customer, member), class: 'text-blue-600 hover:underline' %>
+                  <%= button_to '削除', customer_family_member_path(@customer, member),
+                      method: :delete,
+                      class: 'text-red-600 hover:underline ml-2',
+                      data: { confirm: "#{member.name}を削除しますか？" } %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="p-6">
+        <p class="text-gray-400 text-center">家族メンバーが登録されていません</p>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- 戻るリンク -->
+  <div class="pt-4">
+    <%= link_to '← 顧客詳細に戻る', customer_path(@customer), class: 'text-gray-500 hover:text-gray-700' %>
+  </div>
+</div>

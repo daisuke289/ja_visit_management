@@ -195,7 +195,7 @@
       <div class="bg-white rounded-lg shadow">
         <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
           <h3 class="text-lg font-semibold text-gray-800">家族構成</h3>
-          <%# link_to '編集', customer_family_members_path(@customer), class: 'text-sm text-blue-600 hover:underline' %>
+          <%= link_to '編集', customer_family_members_path(@customer), class: 'text-sm text-blue-600 hover:underline' %>
         </div>
         <div class="p-6">
           <% if @customer.family_members.any? %>
@@ -222,7 +222,7 @@
       <div class="bg-white rounded-lg shadow">
         <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
           <h3 class="text-lg font-semibold text-gray-800">財産診断</h3>
-          <%# link_to 'アップロード', new_customer_diagnosis_path(@customer), class: 'text-sm text-blue-600 hover:underline' %>
+          <%= link_to 'アップロード', new_customer_diagnosis_path(@customer), class: 'text-sm text-blue-600 hover:underline' %>
         </div>
         <div class="p-6">
           <% if @customer.diagnoses.any? %>

@@ -6,3 +6,6 @@ import { application } from "./application"
 
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
+
+import JaCustomerSearchController from "./ja_customer_search_controller"
+application.register("ja-customer-search", JaCustomerSearchController)

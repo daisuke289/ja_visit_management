@@ -1,0 +1,163 @@
+<%= form_with model: [@customer, @family_member], class: 'space-y-6', data: { controller: 'ja-customer-search' } do |f| %>
+  <% if @family_member.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+      <h4 class="text-red-800 font-medium">エラーが発生しました</h4>
+      <ul class="mt-2 text-sm text-red-600 list-disc list-inside">
+        <% @family_member.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-800">基本情報</h3>
+    </div>
+    <div class="p-6 space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <%= f.label :name, '氏名', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= f.text_field :name, class: 'w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500' %>
+        </div>
+        <div>
+          <%= f.label :name_kana, '氏名カナ', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= f.text_field :name_kana, class: 'w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500' %>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <%= f.label :relationship, '続柄（自由入力）', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= f.text_field :relationship, placeholder: '例: 長男、配偶者、孫', class: 'w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500' %>
+        </div>
+        <div>
+          <%= f.label :relationship_type, '続柄タイプ', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= f.select :relationship_type,
+              FamilyMember.relationship_types.keys.map { |k| [I18n.t("enums.family_member.relationship_type.#{k}"), k] },
+              { include_blank: '選択してください' },
+              class: 'w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500' %>
+        </div>
+        <div>
+          <%= f.label :birth_date, '生年月日', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= f.date_field :birth_date, class: 'w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500' %>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <%= f.label :generation, '世代', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <div class="text-xs text-gray-500 mb-1">世帯主=0, 親=+1, 子=-1</div>
+          <%= f.number_field :generation, class: 'w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500' %>
+        </div>
+        <div>
+          <%= f.label :marriage_status, '婚姻状態', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= f.select :marriage_status,
+              FamilyMember.marriage_statuses.keys.map { |k| [I18n.t("enums.family_member.marriage_status.#{k}"), k] },
+              { include_blank: '選択してください' },
+              class: 'w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500' %>
+        </div>
+        <div class="flex items-end space-x-4">
+          <label class="flex items-center">
+            <%= f.check_box :is_living, class: 'rounded border-gray-300 text-blue-600 focus:ring-blue-500' %>
+            <span class="ml-2 text-sm text-gray-700">存命</span>
+          </label>
+          <label class="flex items-center">
+            <%= f.check_box :is_cohabitant, class: 'rounded border-gray-300 text-blue-600 focus:ring-blue-500' %>
+            <span class="ml-2 text-sm text-gray-700">同居</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-800">連絡先・その他</h3>
+    </div>
+    <div class="p-6 space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <%= f.label :phone, '電話番号', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= f.text_field :phone, class: 'w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500' %>
+        </div>
+        <div class="md:col-span-2">
+          <%= f.label :address, '住所（別居の場合）', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= f.text_field :address, class: 'w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500' %>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <%= f.label :occupation, '職業', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= f.text_field :occupation, class: 'w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500' %>
+        </div>
+        <div>
+          <%= f.label :workplace, '勤務先', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= f.text_field :workplace, class: 'w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500' %>
+        </div>
+      </div>
+
+      <div>
+        <%= f.label :notes, '備考', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+        <div class="text-xs text-gray-500 mb-1">「後継者候補」「遠方在住」など</div>
+        <%= f.text_area :notes, rows: 3, class: 'w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500' %>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-800">JA顧客番号連携</h3>
+    </div>
+    <div class="p-6 space-y-4">
+      <div>
+        <%= f.label :ja_customer_number, 'JA顧客番号', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+        <div class="flex space-x-2">
+          <%= f.text_field :ja_customer_number,
+              class: 'flex-1 border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500',
+              data: { ja_customer_search_target: 'input' } %>
+          <button type="button"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+              data-action="click->ja-customer-search#search">
+            検索
+          </button>
+        </div>
+        <p class="text-xs text-gray-500 mt-1">顧客番号を入力して検索すると、JA全顧客マスタから情報を取得できます</p>
+      </div>
+
+      <div id="ja-customer-result" class="hidden" data-ja-customer-search-target="result">
+        <!-- 検索結果がここに表示される -->
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-800">家系図関連</h3>
+    </div>
+    <div class="p-6 space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <%= f.label :parent_member_id, '親（家系図用）', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= f.select :parent_member_id,
+              @customer.family_members.where.not(id: @family_member.id).map { |m| ["#{m.name} (#{m.relationship})", m.id] },
+              { include_blank: '選択なし' },
+              class: 'w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500' %>
+        </div>
+        <div>
+          <%= f.label :spouse_member_id, '配偶者（家系図用）', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= f.select :spouse_member_id,
+              @customer.family_members.where.not(id: @family_member.id).map { |m| ["#{m.name} (#{m.relationship})", m.id] },
+              { include_blank: '選択なし' },
+              class: 'w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500' %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-end space-x-4">
+    <%= link_to 'キャンセル', customer_family_members_path(@customer), class: 'bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg' %>
+    <%= f.submit @family_member.new_record? ? '登録する' : '更新する', class: 'bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg cursor-pointer' %>
+  </div>
+<% end %>
