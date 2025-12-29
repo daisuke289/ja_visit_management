@@ -84,5 +84,4 @@ class DashboardController < ApplicationController
                                  .group("visit_types.name")
                                  .count
   end
-  helper_method :branch_dashboard_data
 end
