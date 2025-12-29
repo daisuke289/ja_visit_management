@@ -2,9 +2,11 @@ class DashboardController < ApplicationController
   def show
     if current_user.can_access_all_branches?
       # 本店ダッシュボード
+      load_admin_dashboard_data
       render :admin
     else
       # 支店ダッシュボード
+      load_branch_dashboard_data
       render :branch
     end
   end
@@ -12,7 +14,7 @@ class DashboardController < ApplicationController
   private
 
   # 本店ダッシュボード用データ
-  def admin_dashboard_data
+  def load_admin_dashboard_data
     @branches = Branch.ordered.includes(:customers)
 
     # 支店別統計
