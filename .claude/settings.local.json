@@ -12,7 +12,8 @@
       "Bash(~/.mise/shims/bundle exec rspec)",
       "Bash(bin/rails:*)",
       "Bash(cat:*)",
-      "Bash(PATH=~/.rbenv/versions/3.2.0/bin:$PATH bundle exec rspec:*)"
+      "Bash(PATH=~/.rbenv/versions/3.2.0/bin:$PATH bundle exec rspec:*)",
+      "Bash(PATH=~/.rbenv/versions/3.2.0/bin:$PATH bundle install:*)"
     ],
     "deny": [
       "Bash(sudo:)",
