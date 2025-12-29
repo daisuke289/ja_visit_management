@@ -71,6 +71,40 @@ Rubyコード（`.rb`ファイル）の調査・分析時は、**必ずSerena MC
 - ビューテンプレート: `.erb`, `.html`
 - ドキュメント: `.md`
 
+### フェーズ完了時のコミット・プッシュ手順
+
+各開発フェーズ（Phase 1〜6）の完了時に、以下の手順でコミット・プッシュを行うこと。
+**変更毎ではなく、フェーズ毎にまとめてコミットする。**
+
+**1. コードチェック:**
+```bash
+bin/rubocop
+```
+- 違反があれば修正する（`bin/rubocop -a` で自動修正可）
+
+**2. セキュリティチェック:**
+```bash
+bin/brakeman -q
+```
+- 重大な脆弱性があれば修正する
+
+**3. テスト実行:**
+```bash
+bundle exec rspec
+```
+- 全テストがパスすることを確認
+
+**4. コミット・プッシュ:**
+```bash
+git add -A
+git commit -m "Implement Phase X: 機能名"
+git push origin main
+```
+
+**コミットメッセージ形式:**
+- `Implement Phase X: 機能名` の形式を使用
+- 例: `Implement Phase 3: Visit management features`
+
 ---
 
 ## データモデル

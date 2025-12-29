@@ -27,8 +27,8 @@ class DashboardController < ApplicationController
 
     # 全体統計
     @total_customers = Customer.count
-    @total_visited_30days = Customer.where('last_visit_date >= ?', 30.days.ago).count
-    @total_overdue_actions = Action.where(status: :pending).where('due_date < ?', Date.current).count
+    @total_visited_30days = Customer.where("last_visit_date >= ?", 30.days.ago).count
+    @total_overdue_actions = Action.where(status: :pending).where("due_date < ?", Date.current).count
     @unvisited_30days = Customer.unvisited_for(30).limit(10)
   end
   helper_method :admin_dashboard_data
@@ -48,7 +48,7 @@ class DashboardController < ApplicationController
     @overdue_actions = Action.joins(:customer)
                              .where(customers: { branch_id: branch.id })
                              .where(status: :pending)
-                             .where('due_date < ?', Date.current)
+                             .where("due_date < ?", Date.current)
                              .order(:due_date)
                              .limit(10)
     @unvisited_30days = branch.customers.unvisited_for(30).limit(10)

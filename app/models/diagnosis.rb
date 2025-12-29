@@ -22,17 +22,17 @@ class Diagnosis < ApplicationRecord
 
   # メソッド
   def display_date
-    diagnosed_on.strftime('%Y/%m/%d')
+    diagnosed_on.strftime("%Y/%m/%d")
   end
 
   def document_type
     return nil unless document.attached?
 
     case document.content_type
-    when 'application/pdf'
+    when "application/pdf"
       :pdf
-    when 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-         'application/vnd.ms-powerpoint'
+    when "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+         "application/vnd.ms-powerpoint"
       :pptx
     else
       :other
@@ -41,9 +41,9 @@ class Diagnosis < ApplicationRecord
 
   def document_icon
     case document_type
-    when :pdf then '📄'
-    when :pptx then '📊'
-    else '📎'
+    when :pdf then "📄"
+    when :pptx then "📊"
+    else "📎"
     end
   end
 
@@ -53,17 +53,17 @@ class Diagnosis < ApplicationRecord
     return unless document.attached?
 
     acceptable_types = [
-      'application/pdf',
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-      'application/vnd.ms-powerpoint'
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "application/vnd.ms-powerpoint"
     ]
 
     unless acceptable_types.include?(document.content_type)
-      errors.add(:document, 'はPDFまたはPowerPointファイルのみアップロード可能です')
+      errors.add(:document, "はPDFまたはPowerPointファイルのみアップロード可能です")
     end
 
     if document.byte_size > 50.megabytes
-      errors.add(:document, 'は50MB以下にしてください')
+      errors.add(:document, "は50MB以下にしてください")
     end
   end
 end

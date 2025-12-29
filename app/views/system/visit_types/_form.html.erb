@@ -1,0 +1,34 @@
+<%= form_with(model: [:system, @visit_type], class: 'space-y-6') do |form| %>
+  <% if @visit_type.errors.any? %>
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+      <p class="font-bold">入力内容に問題があります</p>
+      <ul class="list-disc list-inside mt-2">
+        <% @visit_type.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :name, '種別名', class: 'block text-sm font-medium text-gray-700' %>
+    <%= form.text_field :name, class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500', required: true %>
+  </div>
+
+  <div>
+    <%= form.label :display_order, '表示順', class: 'block text-sm font-medium text-gray-700' %>
+    <%= form.number_field :display_order, class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500', min: 1, required: true %>
+    <p class="mt-1 text-sm text-gray-500">小さい数字ほど上に表示されます</p>
+  </div>
+
+  <div class="flex items-center">
+    <%= form.check_box :active, class: 'h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded' %>
+    <%= form.label :active, '有効', class: 'ml-2 block text-sm text-gray-900' %>
+    <p class="ml-4 text-sm text-gray-500">無効にすると訪問計画・記録作成時に選択できなくなります</p>
+  </div>
+
+  <div class="flex justify-end space-x-3">
+    <%= link_to 'キャンセル', system_visit_types_path, class: 'bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg' %>
+    <%= form.submit class: 'bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg cursor-pointer' %>
+  </div>
+<% end %>

@@ -1,0 +1,62 @@
+<% content_for(:title) { '訪問種別マスタ' } %>
+
+<div class="space-y-6">
+  <div class="flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-gray-800">訪問種別マスタ</h2>
+    <%= link_to '新規登録', new_system_visit_type_path, class: 'bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg' %>
+  </div>
+
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">表示順</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">種別名</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ステータス</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">使用数</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @visit_types.each do |visit_type| %>
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <%= visit_type.display_order %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="text-sm font-medium text-gray-900"><%= visit_type.name %></span>
+              <% if visit_type.inheritance_related? %>
+                <span class="ml-2 text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded">相続関連</span>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <% if visit_type.active? %>
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">有効</span>
+              <% else %>
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">無効</span>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <%= visit_type.usage_count %>件
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <%= link_to '編集', edit_system_visit_type_path(visit_type), class: 'text-blue-600 hover:text-blue-900 mr-4' %>
+              <% if visit_type.usage_count == 0 %>
+                <%= button_to '削除', system_visit_type_path(visit_type),
+                    method: :delete,
+                    class: 'text-red-600 hover:text-red-900',
+                    data: { confirm: '本当に削除しますか？' } %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <% if @visit_types.empty? %>
+      <div class="text-center py-8 text-gray-500">
+        訪問種別が登録されていません
+      </div>
+    <% end %>
+  </div>
+</div>

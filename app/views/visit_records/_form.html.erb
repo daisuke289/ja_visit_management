@@ -1,0 +1,104 @@
+<%= form_with(model: [@customer, @visit_record], class: 'space-y-6') do |form| %>
+  <% if @visit_record.errors.any? %>
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+      <p class="font-bold">入力内容に問題があります</p>
+      <ul class="list-disc list-inside mt-2">
+        <% @visit_record.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <% if @visit_plan.present? %>
+    <div class="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded">
+      <p class="font-medium">計画からの記録作成</p>
+      <p class="text-sm mt-1">
+        予定日: <%= @visit_plan.planned_date.strftime('%Y/%m/%d') %>
+        | 種別: <%= @visit_plan.visit_type&.name %>
+        <% if @visit_plan.purpose.present? %>
+          | 目的: <%= truncate(@visit_plan.purpose, length: 50) %>
+        <% end %>
+      </p>
+    </div>
+    <%= form.hidden_field :visit_plan_id, value: @visit_plan.id %>
+  <% end %>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <%= form.label :visit_type_id, '訪問種別', class: 'block text-sm font-medium text-gray-700' %>
+      <%= form.collection_select :visit_type_id, @visit_types, :id, :name,
+          { prompt: '選択してください' },
+          class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500',
+          required: true %>
+    </div>
+
+    <div>
+      <%= form.label :visited_at, '訪問日時', class: 'block text-sm font-medium text-gray-700' %>
+      <%= form.datetime_local_field :visited_at, class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500', required: true %>
+    </div>
+  </div>
+
+  <div>
+    <%= form.label :interviewee, '面談相手', class: 'block text-sm font-medium text-gray-700' %>
+    <%= form.text_field :interviewee, class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500', placeholder: '世帯主本人、配偶者、長男など' %>
+  </div>
+
+  <div>
+    <%= form.label :content, '折衝内容', class: 'block text-sm font-medium text-gray-700' %>
+    <%= form.text_area :content, rows: 6, class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500', placeholder: '訪問時の会話内容、提案した商品・サービス、顧客の反応などを記録してください（50文字以上必須）', required: true %>
+    <p class="mt-1 text-sm text-gray-500">
+      <span id="content-count">0</span> / 50文字以上
+    </p>
+  </div>
+
+  <div>
+    <%= form.label :customer_situation, '顧客の状況・反応', class: 'block text-sm font-medium text-gray-700' %>
+    <%= form.text_area :customer_situation, rows: 3, class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500', placeholder: '顧客の健康状態、家族の近況、興味を示した内容など' %>
+  </div>
+
+  <div>
+    <%= form.label :attachments, '添付ファイル', class: 'block text-sm font-medium text-gray-700' %>
+    <%= form.file_field :attachments, multiple: true, class: 'mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-green-50 file:text-green-700 hover:file:bg-green-100' %>
+    <p class="mt-1 text-sm text-gray-500">複数ファイル選択可能</p>
+  </div>
+
+  <% unless @visit_record.persisted? %>
+    <div class="border-t pt-6">
+      <h4 class="text-sm font-medium text-gray-700 mb-4">次アクション（任意）</h4>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <%= label_tag 'next_action[title]', 'アクション内容', class: 'block text-sm font-medium text-gray-700' %>
+          <%= text_field_tag 'next_action[title]', nil, class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500', placeholder: '例：財産診断の提案' %>
+        </div>
+        <div>
+          <%= label_tag 'next_action[due_date]', '期限', class: 'block text-sm font-medium text-gray-700' %>
+          <%= date_field_tag 'next_action[due_date]', nil, class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500' %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="flex justify-end space-x-3">
+    <%= link_to 'キャンセル', customer_path(@customer), class: 'bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg' %>
+    <%= form.submit class: 'bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg cursor-pointer' %>
+  </div>
+<% end %>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const contentField = document.querySelector('textarea[name="visit_record[content]"]');
+    const countSpan = document.getElementById('content-count');
+
+    if (contentField && countSpan) {
+      function updateCount() {
+        const count = contentField.value.length;
+        countSpan.textContent = count;
+        countSpan.className = count >= 50 ? 'text-green-600' : 'text-red-600';
+      }
+
+      contentField.addEventListener('input', updateCount);
+      updateCount();
+    }
+  });
+</script>

@@ -1,5 +1,5 @@
 class CustomersController < ApplicationController
-  before_action :set_customer, only: [:show, :edit, :update, :destroy]
+  before_action :set_customer, only: [ :show, :edit, :update, :destroy ]
 
   def index
     @customers = policy_scope(Customer)
@@ -18,12 +18,12 @@ class CustomersController < ApplicationController
 
     # 訪問状況フィルタ
     case params[:visit_status]
-    when 'never'
+    when "never"
       @customers = @customers.where(last_visit_date: nil)
-    when 'overdue'
+    when "overdue"
       @customers = @customers.unvisited_for(30)
-    when 'warning'
-      @customers = @customers.where('last_visit_date >= ? AND last_visit_date < ?', 30.days.ago, 14.days.ago)
+    when "warning"
+      @customers = @customers.where("last_visit_date >= ? AND last_visit_date < ?", 30.days.ago, 14.days.ago)
     end
 
     @customers = @customers.page(params[:page]).per(20)
@@ -52,7 +52,7 @@ class CustomersController < ApplicationController
     end
 
     if @customer.save
-      redirect_to @customer, notice: '重要取引先を登録しました。'
+      redirect_to @customer, notice: "重要取引先を登録しました。"
     else
       render :new, status: :unprocessable_entity
     end
@@ -66,7 +66,7 @@ class CustomersController < ApplicationController
     authorize @customer
 
     if @customer.update(customer_params)
-      redirect_to @customer, notice: '重要取引先を更新しました。'
+      redirect_to @customer, notice: "重要取引先を更新しました。"
     else
       render :edit, status: :unprocessable_entity
     end
@@ -76,7 +76,7 @@ class CustomersController < ApplicationController
     authorize @customer
 
     @customer.destroy
-    redirect_to customers_path, notice: '重要取引先を削除しました。'
+    redirect_to customers_path, notice: "重要取引先を削除しました。"
   end
 
   # JA全顧客マスタから情報を同期
@@ -85,9 +85,9 @@ class CustomersController < ApplicationController
     authorize @customer, :update?
 
     if @customer.sync_from_ja_customer!
-      redirect_to @customer, notice: 'JA顧客マスタから情報を同期しました。'
+      redirect_to @customer, notice: "JA顧客マスタから情報を同期しました。"
     else
-      redirect_to @customer, alert: '同期元のJA顧客データが見つかりません。'
+      redirect_to @customer, alert: "同期元のJA顧客データが見つかりません。"
     end
   end
 

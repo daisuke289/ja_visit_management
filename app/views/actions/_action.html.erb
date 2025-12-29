@@ -1,0 +1,47 @@
+<%= turbo_frame_tag dom_id(action) do %>
+  <div class="flex items-start justify-between p-3 rounded <%= action.overdue? ? 'bg-red-50' : 'bg-gray-50' %>">
+    <div class="flex items-start">
+      <% if action.pending? %>
+        <%= button_to complete_customer_action_path(action.customer, action),
+            method: :patch,
+            class: 'mr-3 mt-1',
+            data: { turbo_method: :patch } do %>
+          <span class="w-5 h-5 border-2 border-gray-400 rounded flex items-center justify-center hover:bg-green-100 hover:border-green-500 cursor-pointer">
+          </span>
+        <% end %>
+      <% else %>
+        <span class="w-5 h-5 mr-3 mt-1 rounded flex items-center justify-center bg-green-500 text-white">
+          <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+          </svg>
+        </span>
+      <% end %>
+      <div>
+        <p class="font-medium <%= action.completed? ? 'line-through text-gray-400' : '' %>"><%= action.title %></p>
+        <p class="text-xs text-gray-500">
+          期限: <%= action.due_date&.strftime('%Y/%m/%d') || '未設定' %>
+          <% if action.pending? && action.overdue? %>
+            <span class="text-red-600 font-medium">（<%= action.days_until_due.abs %>日超過）</span>
+          <% elsif action.pending? && action.days_until_due <= 7 %>
+            <span class="text-yellow-600">（残り<%= action.days_until_due %>日）</span>
+          <% end %>
+        </p>
+      </div>
+    </div>
+    <div class="flex items-center space-x-2">
+      <span class="px-2 py-1 text-xs rounded-full <%= action.completed? ? 'bg-green-100 text-green-800' : action.cancelled? ? 'bg-gray-100 text-gray-800' : action.overdue? ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800' %>">
+        <%= action.due_status_label %>
+      </span>
+      <% if action.pending? %>
+        <%= button_to cancel_customer_action_path(action.customer, action),
+            method: :patch,
+            class: 'text-gray-400 hover:text-red-600',
+            data: { confirm: 'このアクションを中止しますか？', turbo_method: :patch } do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

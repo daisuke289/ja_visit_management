@@ -34,7 +34,7 @@ class User < ApplicationRecord
     if can_access_all_branches?
       Branch.pluck(:id)
     else
-      [branch_id].compact
+      [ branch_id ].compact
     end
   end
 end

@@ -1,0 +1,103 @@
+<% content_for(:title) { '訪問記録一覧' } %>
+
+<div class="space-y-6">
+  <div class="flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-gray-800">訪問記録一覧</h2>
+  </div>
+
+  <!-- フィルタ -->
+  <div class="bg-white rounded-lg shadow p-4">
+    <%= form_with url: visit_records_path, method: :get, class: 'flex flex-wrap gap-4 items-end' do |f| %>
+      <% if current_user.can_access_all_branches? %>
+        <div>
+          <%= f.label :branch_id, '支店', class: 'block text-sm font-medium text-gray-700' %>
+          <%= f.select :branch_id,
+              options_from_collection_for_select(@branches, :id, :name, params[:branch_id]),
+              { include_blank: '全支店' },
+              class: 'mt-1 block rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500' %>
+        </div>
+      <% end %>
+
+      <div>
+        <%= f.label :visit_type_id, '訪問種別', class: 'block text-sm font-medium text-gray-700' %>
+        <%= f.select :visit_type_id,
+            options_from_collection_for_select(@visit_types, :id, :name, params[:visit_type_id]),
+            { include_blank: '全種別' },
+            class: 'mt-1 block rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500' %>
+      </div>
+
+      <div>
+        <%= f.label :from, '期間（開始）', class: 'block text-sm font-medium text-gray-700' %>
+        <%= f.date_field :from, value: params[:from], class: 'mt-1 block rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500' %>
+      </div>
+
+      <div>
+        <%= f.label :to, '期間（終了）', class: 'block text-sm font-medium text-gray-700' %>
+        <%= f.date_field :to, value: params[:to], class: 'mt-1 block rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500' %>
+      </div>
+
+      <div>
+        <%= f.submit '検索', class: 'bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg cursor-pointer' %>
+        <%= link_to 'クリア', visit_records_path, class: 'bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg ml-2' %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- 一覧 -->
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">訪問日時</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">顧客名</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">訪問種別</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">面談相手</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">内容</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @visit_records.each do |record| %>
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900"><%= record.visited_at&.strftime('%Y/%m/%d') %></div>
+              <div class="text-sm text-gray-500"><%= record.visited_at&.strftime('%H:%M') %></div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <%= link_to record.customer.name, customer_path(record.customer), class: 'text-blue-600 hover:underline' %>
+              <div class="text-xs text-gray-500"><%= record.customer.branch&.name %></div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="text-sm text-gray-900"><%= record.visit_type&.name %></span>
+              <% if record.visit_type&.inheritance_related? %>
+                <span class="ml-1 text-xs bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded">相続</span>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <%= record.interviewee %>
+            </td>
+            <td class="px-6 py-4">
+              <div class="text-sm text-gray-900 max-w-xs truncate"><%= record.content_preview(length: 50) %></div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <%= link_to '詳細', customer_visit_record_path(record.customer, record), class: 'text-blue-600 hover:text-blue-900' %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <% if @visit_records.empty? %>
+      <div class="text-center py-8 text-gray-500">
+        訪問記録がありません
+      </div>
+    <% end %>
+  </div>
+
+  <!-- ページネーション -->
+  <% if @visit_records.respond_to?(:total_pages) && @visit_records.total_pages > 1 %>
+    <div class="flex justify-center">
+      <%= paginate @visit_records %>
+    </div>
+  <% end %>
+</div>

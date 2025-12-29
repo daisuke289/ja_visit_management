@@ -75,7 +75,7 @@ if Rails.env.development?
     { customer_number: 'JA004', name: '田中 次郎', name_kana: 'タナカ ジロウ', branch: branch2,
       has_banking: true, has_mutual_aid: true, has_funeral: true },
     { customer_number: 'JA005', name: '高橋 三郎', name_kana: 'タカハシ サブロウ', branch: branch3,
-      has_banking: true, has_gas: true, has_real_estate: true },
+      has_banking: true, has_gas: true, has_real_estate: true }
   ].each do |attrs|
     JaCustomer.find_or_create_by!(customer_number: attrs[:customer_number]) do |c|
       c.name = attrs[:name]
@@ -100,7 +100,7 @@ if Rails.env.development?
   [
     { customer_number: 'JA001', name: '山田 太郎', branch: branch2, last_visit_date: 10.days.ago },
     { customer_number: 'JA002', name: '佐藤 花子', branch: branch2, last_visit_date: 45.days.ago },
-    { customer_number: 'JA003', name: '鈴木 一郎', branch: branch3, last_visit_date: nil },
+    { customer_number: 'JA003', name: '鈴木 一郎', branch: branch3, last_visit_date: nil }
   ].each do |attrs|
     Customer.find_or_create_by!(customer_number: attrs[:customer_number]) do |c|
       c.name = attrs[:name]

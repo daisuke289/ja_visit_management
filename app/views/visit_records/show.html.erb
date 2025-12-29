@@ -1,0 +1,125 @@
+<% content_for(:title) { "訪問記録 - #{@customer.name}" } %>
+
+<div class="max-w-3xl mx-auto space-y-6">
+  <div class="flex justify-between items-start">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-800">訪問記録詳細</h2>
+      <p class="text-gray-500 mt-1">
+        <%= link_to @customer.name, customer_path(@customer), class: 'text-blue-600 hover:underline' %>
+      </p>
+    </div>
+
+    <div class="flex space-x-2">
+      <%= link_to '編集', edit_customer_visit_record_path(@customer, @visit_record), class: 'bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg' %>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+      <h3 class="text-lg font-semibold text-gray-800">記録情報</h3>
+      <span class="px-3 py-1 text-sm font-medium rounded-full bg-green-100 text-green-800">
+        <%= @visit_record.visit_type&.name %>
+      </span>
+    </div>
+    <div class="p-6">
+      <dl class="grid grid-cols-2 gap-4">
+        <div>
+          <dt class="text-sm text-gray-500">訪問日時</dt>
+          <dd class="font-medium text-lg">
+            <%= @visit_record.visited_at&.strftime('%Y年%m月%d日 %H:%M') %>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-sm text-gray-500">面談相手</dt>
+          <dd class="font-medium"><%= @visit_record.interviewee.presence || '-' %></dd>
+        </div>
+        <div>
+          <dt class="text-sm text-gray-500">記録者</dt>
+          <dd class="font-medium"><%= @visit_record.user&.name %></dd>
+        </div>
+        <div>
+          <dt class="text-sm text-gray-500">作成日時</dt>
+          <dd class="font-medium"><%= @visit_record.created_at.strftime('%Y/%m/%d %H:%M') %></dd>
+        </div>
+        <div class="col-span-2">
+          <dt class="text-sm text-gray-500">折衝内容</dt>
+          <dd class="font-medium whitespace-pre-wrap mt-1 p-3 bg-gray-50 rounded"><%= @visit_record.content %></dd>
+        </div>
+        <% if @visit_record.customer_situation.present? %>
+          <div class="col-span-2">
+            <dt class="text-sm text-gray-500">顧客の状況・反応</dt>
+            <dd class="font-medium whitespace-pre-wrap mt-1 p-3 bg-gray-50 rounded"><%= @visit_record.customer_situation %></dd>
+          </div>
+        <% end %>
+      </dl>
+    </div>
+  </div>
+
+  <% if @visit_record.visit_plan.present? %>
+    <div class="bg-white rounded-lg shadow">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-800">元の訪問計画</h3>
+      </div>
+      <div class="p-6">
+        <p class="text-sm text-gray-600">
+          予定日: <%= @visit_record.visit_plan.planned_date.strftime('%Y/%m/%d') %>
+          <% if @visit_record.visit_plan.purpose.present? %>
+            <br>目的: <%= @visit_record.visit_plan.purpose %>
+          <% end %>
+        </p>
+        <%= link_to '計画詳細を見る', customer_visit_plan_path(@customer, @visit_record.visit_plan), class: 'text-blue-600 hover:underline text-sm mt-2 inline-block' %>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @visit_record.attachments.attached? %>
+    <div class="bg-white rounded-lg shadow">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-800">添付ファイル</h3>
+      </div>
+      <div class="p-6">
+        <ul class="space-y-2">
+          <% @visit_record.attachments.each do |attachment| %>
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+              </svg>
+              <%= link_to attachment.filename, rails_blob_path(attachment, disposition: 'attachment'), class: 'text-blue-600 hover:underline' %>
+              <span class="text-gray-400 text-sm ml-2">(<%= number_to_human_size(attachment.byte_size) %>)</span>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @visit_record.actions.any? %>
+    <div class="bg-white rounded-lg shadow">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-800">この記録から作成された次アクション</h3>
+      </div>
+      <div class="p-6">
+        <ul class="space-y-3">
+          <% @visit_record.actions.ordered_by_due_date.each do |action| %>
+            <li class="flex items-start justify-between p-3 rounded <%= action.overdue? ? 'bg-red-50' : 'bg-gray-50' %>">
+              <div>
+                <p class="font-medium"><%= action.title %></p>
+                <p class="text-sm text-gray-500">
+                  期限: <%= action.due_date&.strftime('%Y/%m/%d') %>
+                  | 担当: <%= action.user&.name %>
+                </p>
+              </div>
+              <span class="px-2 py-1 text-xs rounded-full <%= action.completed? ? 'bg-green-100 text-green-800' : action.overdue? ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800' %>">
+                <%= action.due_status_label %>
+              </span>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="pt-4">
+    <%= link_to '← 顧客詳細に戻る', customer_path(@customer), class: 'text-gray-500 hover:text-gray-700' %>
+  </div>
+</div>

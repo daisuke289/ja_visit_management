@@ -2,10 +2,10 @@
 class FamilyMember < ApplicationRecord
   # リレーション
   belongs_to :customer
-  belongs_to :parent_member, class_name: 'FamilyMember', optional: true
-  belongs_to :spouse_member, class_name: 'FamilyMember', optional: true
+  belongs_to :parent_member, class_name: "FamilyMember", optional: true
+  belongs_to :spouse_member, class_name: "FamilyMember", optional: true
 
-  has_many :children, class_name: 'FamilyMember', foreign_key: 'parent_member_id', dependent: :nullify
+  has_many :children, class_name: "FamilyMember", foreign_key: "parent_member_id", dependent: :nullify
 
   # 続柄タイプ
   enum :relationship_type, {
@@ -49,17 +49,17 @@ class FamilyMember < ApplicationRecord
   end
 
   def display_name
-    suffix = is_living? ? '' : '（故人）'
+    suffix = is_living? ? "" : "（故人）"
     "#{name}#{suffix}"
   end
 
   def full_info
-    parts = [name]
+    parts = [ name ]
     parts << "(#{age}歳)" if age
     parts << relationship
-    parts << '【同居】' if is_cohabitant?
-    parts << '【JA取引有】' if ja_customer.present?
-    parts.join(' ')
+    parts << "【同居】" if is_cohabitant?
+    parts << "【JA取引有】" if ja_customer.present?
+    parts.join(" ")
   end
 
   # JA顧客との紐付け

@@ -1,0 +1,113 @@
+<% content_for(:title) { '訪問計画一覧' } %>
+
+<div class="space-y-6">
+  <div class="flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-gray-800">訪問計画一覧</h2>
+  </div>
+
+  <!-- フィルタ -->
+  <div class="bg-white rounded-lg shadow p-4">
+    <%= form_with url: visit_plans_path, method: :get, class: 'flex flex-wrap gap-4 items-end' do |f| %>
+      <% if current_user.can_access_all_branches? %>
+        <div>
+          <%= f.label :branch_id, '支店', class: 'block text-sm font-medium text-gray-700' %>
+          <%= f.select :branch_id,
+              options_from_collection_for_select(@branches, :id, :name, params[:branch_id]),
+              { include_blank: '全支店' },
+              class: 'mt-1 block rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500' %>
+        </div>
+      <% end %>
+
+      <div>
+        <%= f.label :status, 'ステータス', class: 'block text-sm font-medium text-gray-700' %>
+        <%= f.select :status,
+            [['予定・期限切れ', ''], ['予定のみ', 'scheduled'], ['期限切れ', 'overdue'], ['完了', 'completed'], ['中止', 'cancelled']],
+            { selected: params[:status] },
+            class: 'mt-1 block rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500' %>
+      </div>
+
+      <div>
+        <%= f.label :from, '期間（開始）', class: 'block text-sm font-medium text-gray-700' %>
+        <%= f.date_field :from, value: params[:from], class: 'mt-1 block rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500' %>
+      </div>
+
+      <div>
+        <%= f.label :to, '期間（終了）', class: 'block text-sm font-medium text-gray-700' %>
+        <%= f.date_field :to, value: params[:to], class: 'mt-1 block rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500' %>
+      </div>
+
+      <div>
+        <%= f.submit '検索', class: 'bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg cursor-pointer' %>
+        <%= link_to 'クリア', visit_plans_path, class: 'bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg ml-2' %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- 一覧 -->
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">予定日</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">顧客名</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">訪問種別</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">目的</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ステータス</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @visit_plans.each do |plan| %>
+          <tr class="<%= 'bg-red-50' if plan.overdue? %>">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900"><%= plan.planned_date.strftime('%Y/%m/%d') %></div>
+              <% if plan.planned_time.present? %>
+                <div class="text-sm text-gray-500"><%= plan.planned_time.strftime('%H:%M') %></div>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <%= link_to plan.customer.name, customer_path(plan.customer), class: 'text-blue-600 hover:underline' %>
+              <div class="text-xs text-gray-500"><%= plan.customer.branch&.name %></div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <%= plan.visit_type&.name %>
+            </td>
+            <td class="px-6 py-4">
+              <div class="text-sm text-gray-900 max-w-xs truncate"><%= plan.purpose %></div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <% if plan.overdue? %>
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">期限切れ</span>
+              <% elsif plan.scheduled? %>
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">予定</span>
+              <% elsif plan.completed? %>
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">完了</span>
+              <% else %>
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">中止</span>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <% if plan.scheduled? %>
+                <%= link_to '記録を作成', new_customer_visit_record_path(plan.customer, visit_plan_id: plan.id), class: 'text-green-600 hover:text-green-900 mr-3' %>
+              <% end %>
+              <%= link_to '詳細', customer_visit_plan_path(plan.customer, plan), class: 'text-blue-600 hover:text-blue-900' %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <% if @visit_plans.empty? %>
+      <div class="text-center py-8 text-gray-500">
+        訪問計画がありません
+      </div>
+    <% end %>
+  </div>
+
+  <!-- ページネーション -->
+  <% if @visit_plans.respond_to?(:total_pages) && @visit_plans.total_pages > 1 %>
+    <div class="flex justify-center">
+      <%= paginate @visit_plans %>
+    </div>
+  <% end %>
+</div>

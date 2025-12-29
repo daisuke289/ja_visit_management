@@ -4,7 +4,7 @@ class Action < ApplicationRecord
   belongs_to :visit_record
   belongs_to :customer
   belongs_to :user
-  belongs_to :next_visit_record, class_name: 'VisitRecord', optional: true
+  belongs_to :next_visit_record, class_name: "VisitRecord", optional: true
 
   # ステータス
   enum :status, {
@@ -23,12 +23,12 @@ class Action < ApplicationRecord
     joins(:customer).where(customers: { branch_id: branch_id })
   }
   scope :overdue, -> {
-    where(status: :pending).where('due_date < ?', Date.current)
+    where(status: :pending).where("due_date < ?", Date.current)
   }
   scope :due_soon, ->(days: 7) {
     where(status: :pending)
-      .where('due_date <= ?', days.days.from_now)
-      .where('due_date >= ?', Date.current)
+      .where("due_date <= ?", days.days.from_now)
+      .where("due_date >= ?", Date.current)
   }
   scope :by_user, ->(user_id) { where(user_id: user_id) }
   scope :ordered_by_due_date, -> { order(:due_date) }
@@ -52,11 +52,11 @@ class Action < ApplicationRecord
 
   def due_status_label
     case due_status
-    when :overdue then '期限切れ'
-    when :due_soon then '期限間近'
-    when :completed then '完了'
-    when :cancelled then '中止'
-    else '予定'
+    when :overdue then "期限切れ"
+    when :due_soon then "期限間近"
+    when :completed then "完了"
+    when :cancelled then "中止"
+    else "予定"
     end
   end
 

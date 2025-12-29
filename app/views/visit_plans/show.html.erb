@@ -1,0 +1,90 @@
+<% content_for(:title) { "訪問計画 - #{@customer.name}" } %>
+
+<div class="max-w-3xl mx-auto space-y-6">
+  <div class="flex justify-between items-start">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-800">訪問計画詳細</h2>
+      <p class="text-gray-500 mt-1">
+        <%= link_to @customer.name, customer_path(@customer), class: 'text-blue-600 hover:underline' %>
+      </p>
+    </div>
+
+    <div class="flex space-x-2">
+      <% if @visit_plan.scheduled? %>
+        <%= link_to '訪問記録を作成', new_customer_visit_record_path(@customer, visit_plan_id: @visit_plan.id), class: 'bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg' %>
+        <%= link_to '編集', edit_customer_visit_plan_path(@customer, @visit_plan), class: 'bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg' %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+      <h3 class="text-lg font-semibold text-gray-800">計画情報</h3>
+      <% if @visit_plan.overdue? %>
+        <span class="px-3 py-1 text-sm font-semibold rounded-full bg-red-100 text-red-800">期限切れ</span>
+      <% elsif @visit_plan.scheduled? %>
+        <span class="px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">予定</span>
+      <% elsif @visit_plan.completed? %>
+        <span class="px-3 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-800">完了</span>
+      <% else %>
+        <span class="px-3 py-1 text-sm font-semibold rounded-full bg-gray-100 text-gray-800">中止</span>
+      <% end %>
+    </div>
+    <div class="p-6">
+      <dl class="grid grid-cols-2 gap-4">
+        <div>
+          <dt class="text-sm text-gray-500">訪問予定日</dt>
+          <dd class="font-medium text-lg">
+            <%= @visit_plan.planned_date.strftime('%Y年%m月%d日') %>
+            <% if @visit_plan.planned_time.present? %>
+              <span class="text-gray-600"><%= @visit_plan.planned_time.strftime('%H:%M') %></span>
+            <% end %>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-sm text-gray-500">訪問種別</dt>
+          <dd class="font-medium"><%= @visit_plan.visit_type&.name %></dd>
+        </div>
+        <div>
+          <dt class="text-sm text-gray-500">計画作成者</dt>
+          <dd class="font-medium"><%= @visit_plan.user&.name %></dd>
+        </div>
+        <div>
+          <dt class="text-sm text-gray-500">作成日時</dt>
+          <dd class="font-medium"><%= @visit_plan.created_at.strftime('%Y/%m/%d %H:%M') %></dd>
+        </div>
+        <div class="col-span-2">
+          <dt class="text-sm text-gray-500">訪問目的</dt>
+          <dd class="font-medium whitespace-pre-wrap"><%= @visit_plan.purpose.presence || '-' %></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <% if @visit_plan.visit_record.present? %>
+    <div class="bg-white rounded-lg shadow">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-800">訪問記録</h3>
+      </div>
+      <div class="p-6">
+        <div class="border-l-4 border-green-500 pl-4">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="font-medium"><%= @visit_plan.visit_record.visit_type&.name %></span>
+              <span class="text-gray-500 text-sm ml-2">(<%= @visit_plan.visit_record.interviewee %>)</span>
+            </div>
+            <span class="text-sm text-gray-500"><%= @visit_plan.visit_record.visited_at&.strftime('%Y/%m/%d %H:%M') %></span>
+          </div>
+          <p class="text-sm text-gray-600 mt-2"><%= @visit_plan.visit_record.content %></p>
+          <div class="mt-2">
+            <%= link_to '詳細を見る', customer_visit_record_path(@customer, @visit_plan.visit_record), class: 'text-blue-600 hover:underline text-sm' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="pt-4">
+    <%= link_to '← 顧客詳細に戻る', customer_path(@customer), class: 'text-gray-500 hover:text-gray-700' %>
+  </div>
+</div>

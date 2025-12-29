@@ -17,7 +17,7 @@ class ApplicationController < ActionController::Base
   end
 
   def user_not_authorized
-    flash[:alert] = 'この操作を行う権限がありません。'
+    flash[:alert] = "この操作を行う権限がありません。"
     redirect_back(fallback_location: root_path)
   end
 

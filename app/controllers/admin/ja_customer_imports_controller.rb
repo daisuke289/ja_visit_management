@@ -6,7 +6,7 @@ module Admin
 
     def create
       unless params[:file].present?
-        redirect_to new_admin_ja_customer_import_path, alert: 'ファイルを選択してください。'
+        redirect_to new_admin_ja_customer_import_path, alert: "ファイルを選択してください。"
         return
       end
 
@@ -14,7 +14,7 @@ module Admin
 
       # ファイル形式チェック
       unless valid_file_format?(file)
-        redirect_to new_admin_ja_customer_import_path, alert: 'CSV形式のファイルを選択してください。'
+        redirect_to new_admin_ja_customer_import_path, alert: "CSV形式のファイルを選択してください。"
         return
       end
 
@@ -26,7 +26,7 @@ module Admin
       )
 
       redirect_to new_admin_ja_customer_import_path,
-                  notice: 'インポートを開始しました。完了後にメールで通知します。'
+                  notice: "インポートを開始しました。完了後にメールで通知します。"
     end
 
     # インポート結果の確認
@@ -37,14 +37,14 @@ module Admin
     private
 
     def valid_file_format?(file)
-      File.extname(file.original_filename).downcase.in?(['.csv', '.xlsx', '.xls'])
+      File.extname(file.original_filename).downcase.in?([ ".csv", ".xlsx", ".xls" ])
     end
 
     def import_history
       # ImportLogモデルがある場合はログを取得
       # なければ空配列
       if defined?(ImportLog)
-        ImportLog.where(import_type: 'ja_customers')
+        ImportLog.where(import_type: "ja_customers")
                  .order(created_at: :desc)
                  .limit(10)
       else

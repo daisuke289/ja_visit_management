@@ -1,0 +1,53 @@
+<%= form_with(model: [@customer, @visit_plan], class: 'space-y-6') do |form| %>
+  <% if @visit_plan.errors.any? %>
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+      <p class="font-bold">入力内容に問題があります</p>
+      <ul class="list-disc list-inside mt-2">
+        <% @visit_plan.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :visit_type_id, '訪問種別', class: 'block text-sm font-medium text-gray-700' %>
+    <%= form.collection_select :visit_type_id, @visit_types, :id, :name,
+        { prompt: '選択してください' },
+        class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500',
+        required: true %>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <%= form.label :planned_date, '訪問予定日', class: 'block text-sm font-medium text-gray-700' %>
+      <%= form.date_field :planned_date, class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500', required: true %>
+    </div>
+
+    <div>
+      <%= form.label :planned_time, '訪問予定時刻（任意）', class: 'block text-sm font-medium text-gray-700' %>
+      <%= form.time_field :planned_time, class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500' %>
+    </div>
+  </div>
+
+  <div>
+    <%= form.label :purpose, '訪問目的', class: 'block text-sm font-medium text-gray-700' %>
+    <%= form.text_area :purpose, rows: 4, class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500', placeholder: '訪問の目的や確認事項を入力してください' %>
+  </div>
+
+  <% if @visit_plan.persisted? %>
+    <div>
+      <%= form.label :status, 'ステータス', class: 'block text-sm font-medium text-gray-700' %>
+      <%= form.select :status,
+          [['予定', 'scheduled'], ['完了', 'completed'], ['中止', 'cancelled']],
+          {},
+          class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500' %>
+      <p class="mt-1 text-sm text-gray-500">※訪問記録を作成すると自動的に「完了」になります</p>
+    </div>
+  <% end %>
+
+  <div class="flex justify-end space-x-3">
+    <%= link_to 'キャンセル', customer_path(@customer), class: 'bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg' %>
+    <%= form.submit class: 'bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg cursor-pointer' %>
+  </div>
+<% end %>

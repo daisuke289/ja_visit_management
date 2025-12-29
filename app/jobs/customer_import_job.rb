@@ -2,8 +2,8 @@ class CustomerImportJob < ApplicationJob
   queue_as :default
 
   def perform(file_content, filename, user_id)
-    require 'csv'
-    require 'tempfile'
+    require "csv"
+    require "tempfile"
 
     user = User.find(user_id)
     imported = 0
@@ -11,13 +11,13 @@ class CustomerImportJob < ApplicationJob
     errors = []
     start_time = Time.current
 
-    tempfile = Tempfile.new(['import', File.extname(filename)])
+    tempfile = Tempfile.new([ "import", File.extname(filename) ])
     begin
       tempfile.binmode
-      tempfile.write(file_content.force_encoding('UTF-8'))
+      tempfile.write(file_content.force_encoding("UTF-8"))
       tempfile.rewind
 
-      CSV.foreach(tempfile.path, headers: true, encoding: 'Shift_JIS:UTF-8') do |row|
+      CSV.foreach(tempfile.path, headers: true, encoding: "Shift_JIS:UTF-8") do |row|
         result = process_row(row)
         case result[:status]
         when :created
@@ -36,7 +36,7 @@ class CustomerImportJob < ApplicationJob
     end
 
     log_import_result(
-      import_type: 'customers',
+      import_type: "customers",
       user: user,
       filename: filename,
       imported: imported,
@@ -51,8 +51,8 @@ class CustomerImportJob < ApplicationJob
   private
 
   def process_row(row)
-    customer_number = row['顧客番号']&.strip
-    return { status: :error, error: { row: row.to_h, error: '顧客番号がありません' } } if customer_number.blank?
+    customer_number = row["顧客番号"]&.strip
+    return { status: :error, error: { row: row.to_h, error: "顧客番号がありません" } } if customer_number.blank?
 
     # 既に重要取引先として登録済みならスキップ
     if Customer.exists?(customer_number: customer_number)
@@ -76,15 +76,15 @@ class CustomerImportJob < ApplicationJob
       )
     else
       # CSVから直接情報を取得（JA全顧客マスタにない場合）
-      branch = Branch.find_by(code: row['支店コード']&.strip)
+      branch = Branch.find_by(code: row["支店コード"]&.strip)
       customer = Customer.new(
         customer_number: customer_number,
-        household_number: row['世帯番号']&.strip,
-        name: row['氏名']&.strip,
-        name_kana: row['氏名カナ']&.strip,
-        postal_code: row['郵便番号']&.strip,
-        address: row['住所']&.strip,
-        phone: row['電話番号']&.strip,
+        household_number: row["世帯番号"]&.strip,
+        name: row["氏名"]&.strip,
+        name_kana: row["氏名カナ"]&.strip,
+        postal_code: row["郵便番号"]&.strip,
+        address: row["住所"]&.strip,
+        phone: row["電話番号"]&.strip,
         branch: branch
       )
     end

@@ -23,7 +23,7 @@ class VisitPlan < ApplicationRecord
   }
   scope :upcoming, -> {
     where(status: :scheduled)
-      .where('planned_date >= ?', Date.current)
+      .where("planned_date >= ?", Date.current)
       .order(:planned_date)
   }
   scope :this_week, -> {
@@ -33,7 +33,7 @@ class VisitPlan < ApplicationRecord
     where(planned_date: Date.current.beginning_of_month..Date.current.end_of_month)
   }
   scope :overdue, -> {
-    where(status: :scheduled).where('planned_date < ?', Date.current)
+    where(status: :scheduled).where("planned_date < ?", Date.current)
   }
 
   # メソッド
@@ -41,7 +41,7 @@ class VisitPlan < ApplicationRecord
     if planned_time.present?
       "#{planned_date.strftime('%Y/%m/%d')} #{planned_time.strftime('%H:%M')}"
     else
-      planned_date.strftime('%Y/%m/%d')
+      planned_date.strftime("%Y/%m/%d")
     end
   end
 
@@ -67,7 +67,7 @@ class VisitPlan < ApplicationRecord
 
   # iCal出力用
   def to_ical
-    require 'icalendar'
+    require "icalendar"
 
     cal = Icalendar::Calendar.new
     cal.event do |e|

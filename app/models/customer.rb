@@ -16,10 +16,10 @@ class Customer < ApplicationRecord
   # スコープ
   scope :by_branch, ->(branch_id) { where(branch_id: branch_id) }
   scope :unvisited_for, ->(days) {
-    where('last_visit_date IS NULL OR last_visit_date < ?', days.days.ago)
+    where("last_visit_date IS NULL OR last_visit_date < ?", days.days.ago)
   }
   scope :search, ->(query) {
-    where('name LIKE ? OR name_kana LIKE ? OR customer_number LIKE ?',
+    where("name LIKE ? OR name_kana LIKE ? OR customer_number LIKE ?",
           "%#{query}%", "%#{query}%", "%#{query}%")
   }
 
@@ -50,7 +50,7 @@ class Customer < ApplicationRecord
   end
 
   def overdue_actions
-    actions.where(status: :pending).where('due_date < ?', Date.current)
+    actions.where(status: :pending).where("due_date < ?", Date.current)
   end
 
   # JA全顧客マスタとの紐付け

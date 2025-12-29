@@ -1,0 +1,3 @@
+<%= turbo_stream.replace @action do %>
+  <%= render partial: 'actions/action', locals: { action: @action } %>
+<% end %>

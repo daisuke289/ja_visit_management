@@ -22,7 +22,7 @@ class Branch < ApplicationRecord
     total = customers.count
     return 0 if total.zero?
 
-    visited = customers.where('last_visit_date >= ?', days.days.ago).count
+    visited = customers.where("last_visit_date >= ?", days.days.ago).count
     (visited.to_f / total * 100).round(1)
   end
 
@@ -31,7 +31,7 @@ class Branch < ApplicationRecord
     Action.joins(:customer)
           .where(customers: { branch_id: id })
           .where(status: :pending)
-          .where('due_date < ?', Date.current)
+          .where("due_date < ?", Date.current)
           .count
   end
 end

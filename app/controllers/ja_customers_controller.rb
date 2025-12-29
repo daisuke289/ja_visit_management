@@ -32,7 +32,7 @@ class JaCustomersController < ApplicationController
             customer_number: @ja_customer.customer_number,
             name: @ja_customer.name,
             name_kana: @ja_customer.name_kana,
-            birth_date: @ja_customer.birth_date&.strftime('%Y-%m-%d'),
+            birth_date: @ja_customer.birth_date&.strftime("%Y-%m-%d"),
             postal_code: @ja_customer.postal_code,
             address: @ja_customer.address,
             phone: @ja_customer.phone,
@@ -41,7 +41,7 @@ class JaCustomersController < ApplicationController
           }
         }
       else
-        render json: { found: false, message: '該当する顧客が見つかりません' }
+        render json: { found: false, message: "該当する顧客が見つかりません" }
       end
     else
       # キーワード検索

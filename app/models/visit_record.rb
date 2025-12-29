@@ -11,7 +11,7 @@ class VisitRecord < ApplicationRecord
 
   # バリデーション
   validates :visited_at, presence: true
-  validates :content, presence: true, length: { minimum: 50, message: 'は50文字以上で入力してください' }
+  validates :content, presence: true, length: { minimum: 50, message: "は50文字以上で入力してください" }
 
   # スコープ
   scope :by_branch, ->(branch_id) {
@@ -29,7 +29,7 @@ class VisitRecord < ApplicationRecord
 
   # メソッド
   def duration_display
-    visited_at.strftime('%Y/%m/%d %H:%M')
+    visited_at.strftime("%Y/%m/%d %H:%M")
   end
 
   def content_preview(length: 50)
