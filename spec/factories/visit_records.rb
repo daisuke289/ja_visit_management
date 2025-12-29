@@ -5,7 +5,7 @@ FactoryBot.define do
     association :customer
     association :user
     association :visit_type
-    association :visit_plan
+    visit_plan { nil }
     visited_at { Time.current }
     interviewee { "世帯主本人" }
     content { "本日は定期訪問として伺いました。お変わりなくお過ごしとのことです。特に相談事項はありませんでした。" }
