@@ -44,10 +44,9 @@ class DashboardController < ApplicationController
                                  .group("visit_types.name")
                                  .count
   end
-  helper_method :admin_dashboard_data
 
   # 支店ダッシュボード用データ
-  def branch_dashboard_data
+  def load_branch_dashboard_data
     branch = current_user.branch
     return {} unless branch
 
