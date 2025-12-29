@@ -22,8 +22,12 @@ RSpec.describe Customer, type: :model do
   describe "scopes" do
     describe ".unvisited_for" do
       it "returns customers not visited within days" do
-        visited_recently = create(:customer, branch: branch, last_visit_date: 10.days.ago)
-        not_visited = create(:customer, branch: branch, last_visit_date: 40.days.ago)
+        visited_recently = create(:customer, branch: branch)
+        visited_recently.update!(last_visit_date: 10.days.ago)
+
+        not_visited = create(:customer, branch: branch)
+        not_visited.update!(last_visit_date: 40.days.ago)
+
         never_visited = create(:customer, branch: branch, last_visit_date: nil)
 
         result = Customer.unvisited_for(30)
@@ -46,18 +50,21 @@ RSpec.describe Customer, type: :model do
   end
 
   describe "#visit_status" do
-    it "returns :good when visited within 14 days" do
-      customer = create(:customer, branch: branch, last_visit_date: 7.days.ago)
-      expect(customer.visit_status).to eq(:good)
+    it "returns :ok when visited within 14 days" do
+      customer = create(:customer, branch: branch)
+      customer.update!(last_visit_date: 7.days.ago)
+      expect(customer.visit_status).to eq(:ok)
     end
 
     it "returns :warning when visited between 14 and 30 days" do
-      customer = create(:customer, branch: branch, last_visit_date: 20.days.ago)
+      customer = create(:customer, branch: branch)
+      customer.update!(last_visit_date: 20.days.ago)
       expect(customer.visit_status).to eq(:warning)
     end
 
     it "returns :overdue when visited more than 30 days ago" do
-      customer = create(:customer, branch: branch, last_visit_date: 40.days.ago)
+      customer = create(:customer, branch: branch)
+      customer.update!(last_visit_date: 40.days.ago)
       expect(customer.visit_status).to eq(:overdue)
     end
 
@@ -74,7 +81,8 @@ RSpec.describe Customer, type: :model do
     end
 
     it "returns the number of days since last visit" do
-      customer = create(:customer, branch: branch, last_visit_date: 10.days.ago)
+      customer = create(:customer, branch: branch)
+      customer.update!(last_visit_date: 10.days.ago.to_date)
       expect(customer.days_since_last_visit).to eq(10)
     end
   end
