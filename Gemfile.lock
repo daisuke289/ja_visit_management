@@ -352,6 +352,8 @@ GEM
     ruby-progressbar (1.13.0)
     rubyzip (3.2.2)
     securerandom (0.4.1)
+    shoulda-matchers (7.0.1)
+      activesupport (>= 7.1)
     simple_calendar (3.1.0)
       rails (>= 6.1)
     solid_cable (3.0.12)
@@ -447,6 +449,7 @@ DEPENDENCIES
   roo
   rspec-rails
   rubocop-rails-omakase
+  shoulda-matchers
   simple_calendar
   solid_cable
   solid_cache
