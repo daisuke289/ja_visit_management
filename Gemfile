@@ -77,6 +77,10 @@ gem "devise-i18n"
 # iCal出力（訪問計画のカレンダー連携用）
 gem "icalendar"
 
+# グラフ表示
+gem "chartkick"
+gem "groupdate"
+
 group :development, :test do
   gem "rspec-rails"
   gem "factory_bot_rails"
